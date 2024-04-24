@@ -1,6 +1,8 @@
-import 'package:agrotech_app/home.dart';
+import 'package:agrotech_app/Routes/routes.dart';
+import 'package:agrotech_app/login.dart';
 import 'package:agrotech_app/splash.dart';
 import 'package:flutter/material.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -19,6 +21,8 @@ class _MyAppState extends State<MyApp> {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home:SplashPage() ,
+      initialRoute: "/",
+      onGenerateRoute:RouteGenerator.generateRoute,
 
 
     );
