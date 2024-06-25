@@ -1,6 +1,7 @@
 import 'package:agrotech_app/Routes/routes.dart';
 import 'package:agrotech_app/login.dart';
-import 'package:agrotech_app/splash.dart';
+import 'package:agrotech_app/screen/splashscreen/splash.dart';
+
 import 'package:flutter/material.dart';
 
 

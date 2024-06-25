@@ -1,19 +1,45 @@
+import 'package:agrotech_app/api.dart';
 import 'package:agrotech_app/forgotpass/forgotpassword.dart';
-import 'package:agrotech_app/homepage.dart';
+import 'package:agrotech_app/screen/homepage.dart';
+import 'package:agrotech_app/screen/signup.dart';
 import 'package:flutter/material.dart';
 
-class login extends StatefulWidget {
-  const login({Key? key});
+class Login extends StatefulWidget {
+  const Login({Key? key});
 
   @override
-  State<login> createState() => _loginState();
+  State<Login> createState() => _LoginState();
 }
 
-class _loginState extends State<login> {
+class _LoginState extends State<Login> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
-  bool _obsecureText = false;
+  bool _obsecureText = true;
   final _formKey = GlobalKey<FormState>();
+  final ApiService _apiService = ApiService();
+  RegExp emailRegex =
+      RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+  void _login() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        final response = await _apiService.login(
+            _emailController.text, _passwordController.text);
+        if (response.containsKey('Token')) {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text("Login Successful")));
+          Navigator.push(
+              context, MaterialPageRoute(builder: (_) => HomePage()));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Invalid login credentials")));
+        }
+      } catch (e) {
+        print(e);
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("An error occurred: $e")));
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +56,7 @@ class _loginState extends State<login> {
         ),
         body: _orientation == Orientation.portrait
             ? SingleChildScrollView(
-              child: Column(
+                child: Column(
                   crossAxisAlignment:
                       CrossAxisAlignment.start, // Align children to the start
                   children: [
@@ -39,16 +65,16 @@ class _loginState extends State<login> {
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         "Welcome To Agro-Tech Hub!",
-                        style:
-                            TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         "Enter Your E-mail",
-                        style:
-                            TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
                       ),
                     ),
                     Padding(
@@ -57,11 +83,11 @@ class _loginState extends State<login> {
                         controller: _emailController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            if (value == null || value.isEmpty) {
-                              return 'You cannot leave this field empty';
-                            } else {
-                              return null;
-                            }
+                            return 'You cannot leave this field empty';
+                          } else if (!emailRegex.hasMatch(value)) {
+                            return 'Enter a valid email address';
+                          } else {
+                            return null;
                           }
                         },
                         decoration: InputDecoration(
@@ -76,14 +102,15 @@ class _loginState extends State<login> {
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         "Enter Your Password",
-                        style:
-                            TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: TextFormField(
                         obscureText: _obsecureText,
+                        controller: _passwordController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'You cannot leave this field empty';
@@ -91,17 +118,17 @@ class _loginState extends State<login> {
                             return null;
                           }
                         },
-                        controller: _passwordController,
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  _obsecureText = !_obsecureText;
-                                });
-                              },
-                              icon: _obsecureText
-                                  ? Icon(Icons.visibility_off)
-                                  : Icon(Icons.visibility)),
+                            onPressed: () {
+                              setState(() {
+                                _obsecureText = !_obsecureText;
+                              });
+                            },
+                            icon: _obsecureText
+                                ? Icon(Icons.visibility_off)
+                                : Icon(Icons.visibility),
+                          ),
                           hintText: "Password",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -119,60 +146,60 @@ class _loginState extends State<login> {
                                   builder: (_) => ForgotPassword()));
                         },
                         child: Container(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              "Forgot Password?",
-                              style: TextStyle(color: Colors.blue),
-                            )),
-                      ),
-                    ),
-                    SizedBox(
-                      height: height * 0.03,
-                    ),
-                    Center(
-                      child: GestureDetector(
-                        onTap: () {
-                          if (_formKey.currentState!.validate()) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Login Successfull")));
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (_) => homepage()));
-                          }
-                        },
-                        child: Container(
-                          height: height * 0.05,
-                          width: height * 0.13,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              color: Colors.green),
-                          child: Center(
-                            child: Container(
-                              child: Text("Login"),
-                            ),
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            "Forgot Password?",
+                            style: TextStyle(color: Colors.blue),
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: height * 0.03,
+                    SizedBox(height: height * 0.03),
+                    Center(
+                      child: GestureDetector(
+                        onTap: _login,
+                        child: Container(
+                          height: height * 0.05,
+                          width: height * 0.13,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            color: Colors.green,
+                          ),
+                          child: Center(
+                            child: Text("Login"),
+                          ),
+                        ),
+                      ),
                     ),
+                    SizedBox(height: height * 0.05),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          child: Text("Don't Have an Account?"),
-                        ),
-                        Text(
-                          " Signup",
-                          style: TextStyle(color: Colors.blue),
+                        Text("Don't Have an Account?"),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => Signuppage()));
+                          },
+                          child: Text(
+                            " Signup",
+                            style: TextStyle(color: Colors.blue),
+                          ),
                         ),
                       ],
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Container(
-                          alignment: Alignment.center, child: Text("OR")),
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Divider(
+                        height: 20,
+                        color: Colors.grey,
+                        thickness: 1,
+                      ),
                     ),
+
+                    SizedBox(height: height * 0.02),
                     Center(
                       child: Container(
                         height: height * 0.05,
@@ -192,14 +219,14 @@ class _loginState extends State<login> {
                               ),
                             ),
                             SizedBox(width: 8), // Add SizedBox for gap
-                            Text("Sign in with Google")
+                            Text("Sign in with Google"),
                           ],
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
-            )
+              )
             : SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment:
@@ -229,6 +256,8 @@ class _loginState extends State<login> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'You cannot leave this field empty';
+                          } else if (!emailRegex.hasMatch(value)) {
+                            return 'Enter a valid email address';
                           } else {
                             return null;
                           }
@@ -263,14 +292,15 @@ class _loginState extends State<login> {
                         },
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  _obsecureText = !_obsecureText;
-                                });
-                              },
-                              icon: _obsecureText
-                                  ? Icon(Icons.visibility_off)
-                                  : Icon(Icons.visibility)),
+                            onPressed: () {
+                              setState(() {
+                                _obsecureText = !_obsecureText;
+                              });
+                            },
+                            icon: _obsecureText
+                                ? Icon(Icons.visibility_off)
+                                : Icon(Icons.visibility),
+                          ),
                           hintText: "Password",
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -281,60 +311,71 @@ class _loginState extends State<login> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Container(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            "Forgot Password?",
-                            style: TextStyle(color: Colors.blue),
-                          )),
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          "Forgot Password?",
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      ),
                     ),
-                    SizedBox(
-                      height: height * 0.03,
-                    ),
+                    SizedBox(height: height * 0.03),
                     Center(
                       child: GestureDetector(
                         onTap: () {
                           if (_formKey.currentState!.validate()) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Login Successfull")));
-                                                          Navigator.push(context,
-                              MaterialPageRoute(builder: (_) => homepage()));
+                                SnackBar(content: Text("Login Successful")));
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (_) => HomePage()));
                           }
-
                         },
                         child: Container(
                           height: height * 0.1,
                           width: height * 0.30,
                           decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              color: Colors.green),
+                            borderRadius: BorderRadius.circular(16),
+                            color: Colors.green,
+                          ),
                           child: Center(
-                            child: Container(
-                              child: Text("Login"),
-                            ),
+                            child: Text("Login"),
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: height * 0.03,
-                    ),
+                    SizedBox(height: height * 0.03),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          child: Text("Don't Have an Account?"),
-                        ),
-                        Text(
-                          " Signup",
-                          style: TextStyle(color: Colors.blue),
+                        Text("Don't Have an Account?"),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => Signuppage()));
+                          },
+                          child: Text(
+                            " Signup",
+                            style: TextStyle(color: Colors.blue),
+                          ),
                         ),
                       ],
                     ),
                     Padding(
                       padding: const EdgeInsets.all(12.0),
-                      child: Container(
-                          alignment: Alignment.center, child: Text("OR")),
+                      child: Center(
+                        child: Text("OR"),
+                      ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Divider(
+                        height: 20,
+                        color: Colors.black,
+                        thickness: 1,
+                      ),
+                    ),
+                    SizedBox(height: height * 0.03),
                     Center(
                       child: Container(
                         height: height * 0.1,
@@ -350,15 +391,15 @@ class _loginState extends State<login> {
                               padding: const EdgeInsets.all(8.0),
                               child: Image.asset(
                                 "assets/google.png",
-                                height: height * 2,
+                                height: height * 0.04,
                               ),
                             ),
                             SizedBox(width: 8), // Add SizedBox for gap
-                            Text("Sign in with Google")
+                            Text("Sign in with Google"),
                           ],
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),

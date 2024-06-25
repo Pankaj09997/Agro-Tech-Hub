@@ -57,7 +57,7 @@ class _SplashPageState extends State<SplashPage>
         } else {
           // Redirect to next page after animation completes 2 times
           Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) =>login()));
+              MaterialPageRoute(builder: (context) =>Login()));
         }
       }
     });
