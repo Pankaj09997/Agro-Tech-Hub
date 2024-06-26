@@ -36,7 +36,7 @@ class _LoginState extends State<Login> {
       } catch (e) {
         print(e);
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("An error occurred: $e")));
+            .showSnackBar(SnackBar(content: Text("Invalid Login Credentials: $e")));
       }
     }
   }

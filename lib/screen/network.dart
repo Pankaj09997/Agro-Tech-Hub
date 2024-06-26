@@ -1,4 +1,5 @@
 import 'package:agrotech_app/colors/Colors.dart';
+import 'package:agrotech_app/screen/postpage.dart';
 import 'package:flutter/material.dart';
 
 class NetworkPage extends StatefulWidget {
@@ -14,10 +15,9 @@ class _NetworkPageState extends State<NetworkPage> {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     return PopScope(
-onPopInvoked: (didPop) {
-          Navigator.pushReplacementNamed(context, '/home');
-        
-},
+      onPopInvoked: (didPop) {
+        Navigator.pushReplacementNamed(context, '/home');
+      },
       child: Scaffold(
         appBar: AppBar(
           title: Text("Networking"),
@@ -51,8 +51,8 @@ onPopInvoked: (didPop) {
             child: Column(
               children: [
                 Container(
-                  height: height * 0.18,  // Set your desired height
-                  width: width * 1,    // Set your desired width
+                  height: height * 0.18, // Set your desired height
+                  width: width * 1, // Set your desired width
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
@@ -63,6 +63,10 @@ onPopInvoked: (didPop) {
                     child: Column(
                       children: [
                         TextFormField(
+                          onTap: () {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (_) => PostPage()));
+                          },
                           decoration: InputDecoration(
                             hintText: "What's on your mind...?",
                             border: OutlineInputBorder(
@@ -70,9 +74,13 @@ onPopInvoked: (didPop) {
                             ),
                           ),
                         ),
-                        SizedBox(height: height*0.01,),
+                        SizedBox(
+                          height: height * 0.01,
+                        ),
                         Divider(),
-                        SizedBox(height: height*0.01,),
+                        SizedBox(
+                          height: height * 0.01,
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -80,17 +88,13 @@ onPopInvoked: (didPop) {
                               icon: Icons.file_present,
                               color: Colors.black,
                               label: "File",
-                              onTap: () {
-                               
-                              },
+                              onTap: () {},
                             ),
                             ActionButton(
                               icon: Icons.photo,
                               color: Colors.black,
                               label: "Photos",
-                              onTap: () {
-                                
-                              },
+                              onTap: () {},
                             ),
                           ],
                         ),
@@ -99,11 +103,11 @@ onPopInvoked: (didPop) {
                   ),
                 ),
                 SizedBox(
-                  height: height*0.02,
+                  height: height * 0.02,
                 ),
-                              Container(
-                  height: height * 0.5,  // Set your desired height
-                  width: width * 1,    // Set your desired width
+                Container(
+                  height: height * 0.5, // Set your desired height
+                  width: width * 1, // Set your desired width
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
@@ -113,9 +117,34 @@ onPopInvoked: (didPop) {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                      Image.network("https://static-00.iconduck.com/assets.00/person-icon-486x512-eeiy7owm.png",fit: BoxFit.fill,height: height*0.4,),
+                        Container(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              "Meme Nepal",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold),
+                            )),
+                        Container(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              "2h ago",
+                              style: TextStyle(fontSize: 15),
+                            )),
+                        SizedBox(
+                          height: height * 0.02,
+                        ),
+                        Image.network(
+                          "https://static-00.iconduck.com/assets.00/person-icon-486x512-eeiy7owm.png",
+                          fit: BoxFit.fill,
+                          height: height * 0.3,
+                        ),
+                        SizedBox(
+                          height: height * 0.02,
+                        ),
                         Divider(),
-                        SizedBox(height: height*0.01,),
+                        SizedBox(
+                          height: height * 0.02,
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -123,25 +152,19 @@ onPopInvoked: (didPop) {
                               icon: Icons.thumb_up,
                               color: Colors.black,
                               label: "Like",
-                              onTap: () {
-                               
-                              },
+                              onTap: () {},
                             ),
                             ActionButton(
                               icon: Icons.comment,
                               color: Colors.black,
                               label: "Comment",
-                              onTap: () {
-                                
-                              },
+                              onTap: () {},
                             ),
-                                                      ActionButton(
+                            ActionButton(
                               icon: Icons.share,
                               color: Colors.black,
                               label: "Share",
-                              onTap: () {
-                                
-                              },
+                              onTap: () {},
                             ),
                           ],
                         ),
@@ -150,11 +173,11 @@ onPopInvoked: (didPop) {
                   ),
                 ),
                 SizedBox(
-                  height: height*0.02,
+                  height: height * 0.02,
                 ),
-                              Container(
-                  height: height * 0.5,  // Set your desired height
-                  width: width * 1,    // Set your desired width
+                Container(
+                  height: height * 0.5, // Set your desired height
+                  width: width * 1, // Set your desired width
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
@@ -164,9 +187,15 @@ onPopInvoked: (didPop) {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                      Image.network("https://static-00.iconduck.com/assets.00/person-icon-486x512-eeiy7owm.png",fit: BoxFit.fill,height: height*0.4,),
+                        Image.network(
+                          "https://static-00.iconduck.com/assets.00/person-icon-486x512-eeiy7owm.png",
+                          fit: BoxFit.fill,
+                          height: height * 0.4,
+                        ),
                         Divider(),
-                        SizedBox(height: height*0.01,),
+                        SizedBox(
+                          height: height * 0.01,
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -174,25 +203,19 @@ onPopInvoked: (didPop) {
                               icon: Icons.thumb_up,
                               color: Colors.black,
                               label: "Like",
-                              onTap: () {
-                               
-                              },
+                              onTap: () {},
                             ),
                             ActionButton(
                               icon: Icons.comment,
                               color: Colors.black,
                               label: "Comment",
-                              onTap: () {
-                                
-                              },
+                              onTap: () {},
                             ),
-                                                      ActionButton(
+                            ActionButton(
                               icon: Icons.share,
                               color: Colors.black,
                               label: "Share",
-                              onTap: () {
-                                
-                              },
+                              onTap: () {},
                             ),
                           ],
                         ),

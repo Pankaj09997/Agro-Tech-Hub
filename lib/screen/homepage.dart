@@ -38,9 +38,9 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     final currentTime = DateTime.now();
-    print(currentTime);
+    
     final currentHour = currentTime.hour;
-    print(currentHour);
+    
     if (currentHour < 12) {
       greetings = 'Good Morning';
     } else if (currentHour < 17) {
@@ -57,6 +57,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
         elevation: 1,
         actions: [
           IconButton(
@@ -120,7 +121,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     child: InkWell(
                       onTap: () {
-                        Navigator.pushNamed(context, services[index].routeAddress);
+                       Navigator.pushNamed(context, services[index].routeAddress);
                       },
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

@@ -49,7 +49,7 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> userInfo() async {
-     print('Access Token: $_token'); 
+    print('Access Token: $_token');
     final response = await http.get(
       Uri.parse('$baseUrl/profile/'),
       headers: <String, String>{
@@ -63,4 +63,24 @@ class ApiService {
       throw Exception('Failed to load profile');
     }
   }
+
+  // Future<Map<String, dynamic>> postFunction(String post,String filePath,String imagePath) async {
+  //   final response = await http.post(Uri.parse('$baseUrl/post/'),
+
+  //         headers: <String, String>{
+  //       'Content-Type': 'application/json; charset=UTF-8',
+  //     }, 
+  //     body: jsonEncode({
+  //       'post':post,
+  //       'filepath':filePath,
+  //       'imagePath':imagePath
+  //     })
+
+  //   );
+  //   if(response.statusCode==200){
+      
+  //   }
+    
+
+  // }
 }
