@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -64,23 +65,37 @@ class ApiService {
     }
   }
 
-  // Future<Map<String, dynamic>> postFunction(String post,String filePath,String imagePath) async {
-  //   final response = await http.post(Uri.parse('$baseUrl/post/'),
+Future<Map<String, dynamic>> postFunction(String post, File? image, File? file) async {
+  var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/post/'));
 
-  //         headers: <String, String>{
-  //       'Content-Type': 'application/json; charset=UTF-8',
-  //     }, 
-  //     body: jsonEncode({
-  //       'post':post,
-  //       'filepath':filePath,
-  //       'imagePath':imagePath
-  //     })
+  request.fields['post'] = post;
 
-  //   );
-  //   if(response.statusCode==200){
-      
-  //   }
-    
+  if (image!= null) {
+    request.files.add(
+      http.MultipartFile.fromBytes(
+        'image',
+        await image.readAsBytes(),
+        filename: image.path.split('/').last,
+      ),
+    );
+  }
 
-  // }
+  if (file!= null) {
+    request.files.add(
+      http.MultipartFile.fromBytes(
+        'file',
+        await file.readAsBytes(),
+        filename: file.path.split('/').last,
+      ),
+    );
+  }
+
+  var response = await request.send();
+
+  if (response.statusCode == 200) {
+    return {'status': 'success'};
+  } else {
+    return {'status': 'failed'};
+  }
+}
 }
