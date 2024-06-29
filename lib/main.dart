@@ -1,11 +1,15 @@
 import 'package:agrotech_app/Routes/routes.dart';
 import 'package:agrotech_app/login.dart';
 import 'package:agrotech_app/screen/splashscreen/splash.dart';
+import 'package:file_picker/file_picker.dart';
 
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 
 void main() {
+  
+  
   runApp(const MyApp());
 }
 

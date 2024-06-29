@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:agrotech_app/api.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
- // Import your ApiService
+import 'package:agrotech_app/api.dart';
+import 'package:image_picker/image_picker.dart';
 
 class PostPage extends StatefulWidget {
   const PostPage({Key? key}) : super(key: key);
@@ -17,10 +17,27 @@ class _PostPageState extends State<PostPage> {
   File? selectedFile;
   TextEditingController postController = TextEditingController();
 
+  final ImagePicker _picker = ImagePicker();
+
+  File? _image;
+
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        _image = null;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text('Create Post'),
         actions: [
           TextButton(
             onPressed: _uploadPost,
@@ -32,22 +49,13 @@ class _PostPageState extends State<PostPage> {
         ],
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Container(
-              alignment: Alignment.topLeft,
-              child: Text(
-                "Create Post",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextFormField(
               controller: postController,
-              maxLines: 20,
+              maxLines: 5,
               decoration: InputDecoration(
                 hintText: "What's on your mind...?",
                 border: OutlineInputBorder(
@@ -62,35 +70,27 @@ class _PostPageState extends State<PostPage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ActionButton(
+                icon: Icons.photo,
+                color: Colors.black,
+                label: "Select Image",
+                onTap: () async {
+                  _pickImage();
+                },
+              ),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+              ActionButton(
                 icon: Icons.file_present,
                 color: Colors.black,
-                label: "File",
+                label: "Select File",
                 onTap: () async {
-                  FilePickerResult? result = await FilePicker.platform.pickFiles();
+                  FilePickerResult? result =
+                      await FilePicker.platform.pickFiles();
                   if (result != null) {
                     selectedFile = File(result.files.single.path!);
                     setState(() {});
                   }
                 },
               ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-              Divider(),
-              ActionButton(
-                icon: Icons.photo,
-                color: Colors.black,
-                label: "Photos",
-                onTap: () async {
-                  FilePickerResult? result = await FilePicker.platform.pickFiles(
-                    type: FileType.image,
-                  );
-                  if (result != null) {
-                    selectedImage = File(result.files.single.path!);
-                    setState(() {});
-                  }
-                },
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-              Divider(),
             ],
           ),
         ],
@@ -101,8 +101,8 @@ class _PostPageState extends State<PostPage> {
   void _uploadPost() {
     String postText = postController.text;
 
-    if (selectedImage != null) {
-      ApiService().postFunction(postText, selectedImage!, null).then((response) {
+    if (_image != null) {
+      ApiService().postFunction(postText, _image!, null).then((response) {
         // Handle response
         print('Image post uploaded');
         // Optionally, navigate to another page or show a success message
@@ -113,26 +113,17 @@ class _PostPageState extends State<PostPage> {
     }
 
     if (selectedFile != null) {
-      // Determine the type of file based on its extension
-      String fileExtension = selectedFile!.path.split('.').last.toLowerCase();
-
-      if (fileExtension == 'pdf') {
-        // Handle PDF file upload
-        ApiService().postFunction(postText, null, selectedFile!).then((response) {
-          // Handle response
-          print('PDF file post uploaded');
-          // Optionally, navigate to another page or show a success message
-        }).catchError((error) {
-          // Handle error
-          print('Failed to upload PDF file post: $error');
-        });
-      } else {
-        // Handle other types of files (if needed)
-        print('Unsupported file type');
-      }
+      ApiService().postFunction(postText, null, selectedFile!).then((response) {
+        // Handle response
+        print('File post uploaded');
+        // Optionally, navigate to another page or show a success message
+      }).catchError((error) {
+        // Handle error
+        print('Failed to upload file post: $error');
+      });
     }
 
-    if (selectedImage == null && selectedFile == null) {
+    if (_image == null && selectedFile == null) {
       ApiService().postFunction(postText, null, null).then((response) {
         // Handle response
         print('Text post uploaded');
@@ -163,6 +154,7 @@ class ActionButton extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             icon,
