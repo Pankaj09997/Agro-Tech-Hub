@@ -1,12 +1,13 @@
 import 'dart:convert';
-import 'dart:ffi';
+
 import 'dart:io';
-import 'dart:typed_data';
+
 import 'package:http/http.dart' as http;
 
 class ApiService {
   String? _token;
   final String baseUrl = "http://127.0.0.1:8000/api";
+  bool showSpinner = false;
 
   Future<Map<String, dynamic>> login(String email, String password) async {
     final response = await http.post(
@@ -67,46 +68,36 @@ class ApiService {
     }
   }
 
-Future<Map<String, dynamic>> postFunction(String post, File? image, File? file) async {
-  //multipart file system is used to add multiple files,images,post in the single http request
-  var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/post/'));
-//This line adds a text field named post with the value stored in the post variable to the HTTP request.
-  request.fields['post'] = post;
-// This line initiates the process of adding a file to the files list of the multipart request.
-// request.files is a list that holds all the files to be uploaded with the request.
-// add is a method that appends a new file to this list.
-  if (image!= null) {
-// This line initiates the process of adding a file to the files list of the multipart request.
-// request.files is a list that holds all the files to be uploaded with the request.
-// add is a method that appends a new file to this list.
-    request.files.add(
-//This line calls the constructor http.MultipartFile.fromBytes to create a new MultipartFile object from raw bytes.
+  Future<Map<String, dynamic>> postFunction(
+      String post, File? image, File? file) async {
+    var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/post/'));
+    request.fields['post'] = post;
+    if (image!= null) {
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'image',
+          await image.readAsBytes(),
+          filename: image.path.split('/').last,
+        ),
+      );
+    }
 
-      http.MultipartFile.fromBytes(
-        'image',
-        //convert the selected image to bytes
-        await image.readAsBytes(),
-        filename: image.path.split('/').last,
-      ),
-    );
+    if (file!= null) {
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'file',
+          await file.readAsBytes(),
+          filename: file.path.split('/').last,
+        ),
+      );
+    }
+
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      return {'status': 'success'};
+    } else {
+      return {'status': 'failed'};
+    }
   }
-
-  if (file!= null) {
-    request.files.add(
-      http.MultipartFile.fromBytes(
-        'file',
-        await file.readAsBytes(),
-        filename: file.path.split('/').last,
-      ),
-    );
-  }
-
-  var response = await request.send();
-
-  if (response.statusCode == 200) {
-    return {'status': 'success'};
-  } else {
-    return {'status': 'failed'};
-  }
-}
 }
