@@ -99,6 +99,7 @@ class _SignuppageState extends State<Signuppage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Textfield(
+                obsecureText: false,
                 textEditingController: _namecontroller,
                 hintString: "Name",
               ),
@@ -114,6 +115,7 @@ class _SignuppageState extends State<Signuppage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Textfield(
+                obsecureText: false,
                 regExp: RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$'),
                 textEditingController: _emailcontroller,
                 hintString: "E-mail",

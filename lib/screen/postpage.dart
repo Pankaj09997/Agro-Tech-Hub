@@ -1,11 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:agrotech_app/api.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
-import 'package:http/http.dart' as http;
+import 'package:file_picker/file_picker.dart';
 
 class PostPage extends StatefulWidget {
   const PostPage({Key? key}) : super(key: key);
@@ -15,42 +15,93 @@ class PostPage extends StatefulWidget {
 }
 
 class _PostPageState extends State<PostPage> {
-  File? selectedImage;
-  File? image;
-  File? _image;
-  File? selectedFile;
-  TextEditingController postController = TextEditingController();
-
+  File? _selectedImage;
+  File? _selectedFile;
+  final TextEditingController postController = TextEditingController();
   final ImagePicker _picker = ImagePicker();
-  bool showSpinner = false;
+  bool _showSpinner = false;
 
-  Future<void> getImage() async {
-    final PickedFile =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
-    if (PickedFile != null) {
-      image = File(PickedFile.path);
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+    if (pickedFile != null) {
       setState(() {
-        _image = image;
+        _selectedImage = File(pickedFile.path);
+        _selectedFile = null;
       });
     } else {
       print("No Image Selected");
     }
   }
 
-  Future<void> uploadImage() async {
-    if (_image != null) {
-      await ApiService().postFunction(postController.text, _image!, null);
-    } else if (selectedFile != null) {
-      await ApiService().postFunction(postController.text, null, selectedFile!);
-    } else {
-      await ApiService().postFunction(postController.text, null, null);
+  Future<void> _pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      setState(() {
+        _selectedFile = File(result.files.single.path!);
+        _selectedImage = null;
+      });
+    }
+  }
+
+  Future<void> _uploadPost() async {
+    setState(() {
+      _showSpinner = true;
+    });
+
+    try {
+      String postText = postController.text;
+      var response;
+
+      if (_selectedImage != null && _selectedFile != null) {
+        response = await ApiService().postFunction(
+          postText,
+          _selectedImage,
+          _selectedFile,
+        );
+      } else if (_selectedImage != null) {
+        response = await ApiService().postFunction(
+          postText,
+          _selectedImage,
+          null,
+        );
+      } else if (_selectedFile != null) {
+        response = await ApiService().postFunction(
+          postText,
+          null,
+          _selectedFile,
+        );
+      } else if (postText.isNotEmpty) {
+        response = await ApiService().postFunction(
+          postText,
+          null,
+          null,
+        );
+      } else {
+        print('No content to post');
+        return;
+      }
+
+      if (response['status'] == 'success') {
+        print('Post uploaded successfully');
+      } else {
+        print('Failed to upload post: ${response['message']}');
+      }
+    } catch (error) {
+      print('Error: $error');
+    } finally {
+      setState(() {
+        _showSpinner = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(
-      inAsyncCall: showSpinner,
+      inAsyncCall: _showSpinner,
       child: Scaffold(
         appBar: AppBar(
           title: Text('Create Post'),
@@ -63,6 +114,8 @@ class _PostPageState extends State<PostPage> {
               ),
             )
           ],
+          backgroundColor: Colors.white,
+          elevation: 0,
         ),
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -77,48 +130,39 @@ class _PostPageState extends State<PostPage> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(color: Colors.black, width: 2),
+                  ),
                 ),
               ),
             ),
             Divider(),
+            _buildPreviewSection(),
             SizedBox(height: MediaQuery.of(context).size.height * 0.01),
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ActionButton(
-                  icon: Icons.photo,
-                  color: Colors.black,
-                  label: "Select Image",
-                  onTap: () async {
-                    await getImage();
-                    setState(() {
-                      showSpinner = true;
-                    });
-                    await uploadImage();
-                    setState(() {
-                      showSpinner = false;
-                    });
-                  },
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ActionButton(
+                    icon: Icons.photo,
+                    color: Colors.black,
+                    label: "Add Photo/Video",
+                    onTap: () {
+                      _pickImage();
+                      
+                    },
+                  ),
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                ActionButton(
-                  icon: Icons.file_present,
-                  color: Colors.black,
-                  label: "Select File",
-                  onTap: () async {
-                    FilePickerResult? result =
-                        await FilePicker.platform.pickFiles();
-                    if (result != null) {
-                      selectedFile = File(result.files.single.path!);
-                      setState(() {
-                        showSpinner = true;
-                      });
-                      await uploadImage();
-                      setState(() {
-                        showSpinner = false;
-                      });
-                    }
-                  },
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: ActionButton(
+                    icon: Icons.file_present,
+                    color: Colors.black,
+                    label: "Add File",
+                    onTap: _pickFile,
+                  ),
                 ),
               ],
             ),
@@ -128,41 +172,41 @@ class _PostPageState extends State<PostPage> {
     );
   }
 
-  void _uploadPost() {
-    String postText = postController.text;
-
-    if (_image != null) {
-      ApiService().postFunction(postText, _image!, null).then((response) {
-        // Handle response
-        print('Image post uploaded');
-        // Optionally, navigate to another page or show a success message
-      }).catchError((error) {
-        // Handle error
-        print('Failed to upload image post: $error');
-      });
-    }
-
-    if (selectedFile != null) {
-      ApiService().postFunction(postText, null, selectedFile!).then((response) {
-        // Handle response
-        print('File post uploaded');
-        // Optionally, navigate to another page or show a success message
-      }).catchError((error) {
-        // Handle error
-        print('Failed to upload file post: $error');
-      });
-    }
-
-    if (_image == null && selectedFile == null) {
-      ApiService().postFunction(postText, null, null).then((response) {
-        // Handle response
-        print('Text post uploaded');
-        // Optionally, navigate to another page or show a success message
-      }).catchError((error) {
-        // Handle error
-        print('Failed to upload text post: $error');
-      });
-    }
+  Widget _buildPreviewSection() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          if (_selectedImage != null)
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.grey[200], // Light grey background color
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.file(
+                  _selectedImage!,
+                  fit: BoxFit.cover,
+                  height: 200, // Adjust the height as needed
+                ),
+              ),
+            ),
+          if (_selectedFile != null)
+            Column(
+              children: [
+                Icon(Icons.insert_drive_file, size: 50),
+                SizedBox(height: 10),
+                Text('Selected File: ${_selectedFile!.path.split('/').last}'),
+              ],
+            ),
+          if (_selectedImage == null &&
+              _selectedFile == null &&
+              postController.text.isEmpty)
+            Text('No content selected'),
+        ],
+      ),
+    );
   }
 }
 
@@ -183,17 +227,27 @@ class ActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: color,
-            size: 35,
-          ),
-          SizedBox(width: 5),
-          Text(label),
-        ],
+      child: Container(
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.blue.withOpacity(0.1), // Light blue background color
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: color,
+              size: 35,
+            ),
+            SizedBox(width: 5),
+            Text(
+              label,
+              style: TextStyle(color: color),
+            ),
+          ],
+        ),
       ),
     );
   }
