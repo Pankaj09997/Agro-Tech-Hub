@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:agrotech_app/api.dart';
@@ -149,10 +148,7 @@ class _PostPageState extends State<PostPage> {
                     icon: Icons.photo,
                     color: Colors.black,
                     label: "Add Photo/Video",
-                    onTap: () {
-                      _pickImage();
-                      
-                    },
+                    onTap: _pickImage,
                   ),
                 ),
                 Padding(

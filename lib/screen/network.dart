@@ -1,230 +1,261 @@
-import 'package:agrotech_app/colors/Colors.dart';
-import 'package:agrotech_app/screen/postpage.dart';
 import 'package:flutter/material.dart';
+import 'package:agrotech_app/api.dart'; // Adjust import as needed
+import 'package:agrotech_app/screen/comment.dart'; // Adjust import as needed
+import 'package:agrotech_app/screen/postpage.dart'; // Adjust import as needed
 
 class NetworkPage extends StatefulWidget {
-  const NetworkPage({super.key});
+  const NetworkPage({Key? key}) : super(key: key);
 
   @override
   State<NetworkPage> createState() => _NetworkPageState();
 }
 
 class _NetworkPageState extends State<NetworkPage> {
+  final ApiService _apiService = ApiService();
+  List<dynamic> posts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchPosts();
+  }
+
+  Future<void> fetchPosts() async {
+    try {
+      final postsData = await _apiService.postAll();
+      setState(() {
+        posts = postsData;
+      });
+    } catch (e) {
+      print('Failed to fetch posts: $e');
+      // Handle error, e.g., show error message to user
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
-    return PopScope(
-      onPopInvoked: (didPop) {
-        Navigator.pushReplacementNamed(context, '/home');
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("Networking"),
-          iconTheme: IconThemeData(),
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () {
-              Navigator.pushReplacementNamed(context, '/home');
-            },
-          ),
-          actions: [
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.person, color: Colors.black),
-              iconSize: 30,
-            ),
-            SizedBox(width: 10),
-            IconButton(
-              onPressed: () {},
-              icon: Icon(Icons.settings, color: Colors.black),
-              iconSize: 30,
-            ),
-          ],
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Networking"),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pushReplacementNamed(context, '/home');
+          },
         ),
-        body: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Container(
-                  height: height * 0.18, // Set your desired height
-                  width: width * 1, // Set your desired width
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.black),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.person, color: Colors.black),
+            iconSize: 30,
+          ),
+          SizedBox(width: 10),
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.settings, color: Colors.black),
+            iconSize: 30,
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                margin: const EdgeInsets.only(bottom: 16.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      spreadRadius: 1,
+                      blurRadius: 5,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    TextFormField(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => PostPage()),
+                        );
+                      },
+                      decoration: InputDecoration(
+                        hintText: "What's on your mind...?",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: height * 0.01),
+                    Divider(),
+                    SizedBox(height: height * 0.01),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        TextFormField(
-                          onTap: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (_) => PostPage()));
-                          },
-                          decoration: InputDecoration(
-                            hintText: "What's on your mind...?",
-                            border: OutlineInputBorder(
+                        ActionButton(
+                          icon: Icons.file_present,
+                          color: Colors.black,
+                          label: "File",
+                          onTap: () {},
+                        ),
+                        ActionButton(
+                          icon: Icons.photo,
+                          color: Colors.black,
+                          label: "Photos",
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              posts.isEmpty
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: posts.length,
+                      itemBuilder: (context, index) {
+                        var post = posts[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: Container(
+                            padding: const EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  spreadRadius: 1,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                        'https://cdn4.vectorstock.com/i/1000x1000/08/38/avatar-icon-male-user-person-profile-symbol-vector-20910838.jpg', // Replace with actual avatar URL
+                                      ),
+                                      radius: 20,
+                                    ),
+                                    SizedBox(width: 10),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          post['author_name'],
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        Text(
+                                          post['created_at'],
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10),
+                                Text(
+                                  post['content'] ?? '',
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                                if (post['image'] != null)
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => FullScreenImageScreen(
+                                            imageUrl:
+                                                'http://127.0.0.1:8000${post['image']}',
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 10.0),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(16),
+                                        child: Image.network(
+                                          'http://127.0.0.1:8000${post['image']}',
+                                          // Replace with your actual URL or path
+                                          height: height * 0.3,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                Divider(),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    ActionButton(
+                                      icon: Icons.thumb_up,
+                                      color: Colors.black,
+                                      label: "Like",
+                                      onTap: () {
+                                        setState(() {});
+                                      },
+                                    ),
+                                    ActionButton(
+                                      icon: Icons.comment,
+                                      color: Colors.black,
+                                      label: "Comment",
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => CommentPage(
+                                              postId: post['id']??0,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    ActionButton(
+                                      icon: Icons.share,
+                                      color: Colors.black,
+                                      label: "Share",
+                                      onTap: () {},
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          height: height * 0.01,
-                        ),
-                        Divider(),
-                        SizedBox(
-                          height: height * 0.01,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ActionButton(
-                              icon: Icons.file_present,
-                              color: Colors.black,
-                              label: "File",
-                              onTap: () {},
-                            ),
-                            ActionButton(
-                              icon: Icons.photo,
-                              color: Colors.black,
-                              label: "Photos",
-                              onTap: () {},
-                            ),
-                          ],
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                  ),
-                ),
-                SizedBox(
-                  height: height * 0.02,
-                ),
-                Container(
-                  height: height * 0.5, // Set your desired height
-                  width: width * 1, // Set your desired width
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.black),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        Container(
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              "Meme Nepal",
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold),
-                            )),
-                        Container(
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              "2h ago",
-                              style: TextStyle(fontSize: 15),
-                            )),
-                        SizedBox(
-                          height: height * 0.02,
-                        ),
-                        Image.network(
-                          "https://static-00.iconduck.com/assets.00/person-icon-486x512-eeiy7owm.png",
-                          fit: BoxFit.fill,
-                          height: height * 0.3,
-                        ),
-                        SizedBox(
-                          height: height * 0.02,
-                        ),
-                        Divider(),
-                        SizedBox(
-                          height: height * 0.02,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ActionButton(
-                              icon: Icons.thumb_up,
-                              color: Colors.black,
-                              label: "Like",
-                              onTap: () {},
-                            ),
-                            ActionButton(
-                              icon: Icons.comment,
-                              color: Colors.black,
-                              label: "Comment",
-                              onTap: () {},
-                            ),
-                            ActionButton(
-                              icon: Icons.share,
-                              color: Colors.black,
-                              label: "Share",
-                              onTap: () {},
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: height * 0.02,
-                ),
-                Container(
-                  height: height * 0.5, // Set your desired height
-                  width: width * 1, // Set your desired width
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.black),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        Image.network(
-                          "https://static-00.iconduck.com/assets.00/person-icon-486x512-eeiy7owm.png",
-                          fit: BoxFit.fill,
-                          height: height * 0.4,
-                        ),
-                        Divider(),
-                        SizedBox(
-                          height: height * 0.01,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ActionButton(
-                              icon: Icons.thumb_up,
-                              color: Colors.black,
-                              label: "Like",
-                              onTap: () {},
-                            ),
-                            ActionButton(
-                              icon: Icons.comment,
-                              color: Colors.black,
-                              label: "Comment",
-                              onTap: () {},
-                            ),
-                            ActionButton(
-                              icon: Icons.share,
-                              color: Colors.black,
-                              label: "Share",
-                              onTap: () {},
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            ],
           ),
         ),
       ),
@@ -258,6 +289,27 @@ class ActionButton extends StatelessWidget {
           SizedBox(width: 5),
           Text(label),
         ],
+      ),
+    );
+  }
+}
+
+class FullScreenImageScreen extends StatelessWidget {
+  final String imageUrl;
+
+  const FullScreenImageScreen({required this.imageUrl, Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        child: Center(
+          child: Image.network(imageUrl),
+        ),
       ),
     );
   }
