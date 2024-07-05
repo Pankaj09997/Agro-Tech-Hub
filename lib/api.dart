@@ -36,6 +36,7 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       _token = data['Token']['access'];
+      print(_token);
       await _saveToken(_token!);
       return data;
     } else {
@@ -64,25 +65,6 @@ class ApiService {
       return data;
     } else {
       throw Exception('Failed to sign up: ${response.body}');
-    }
-  }
-
-  Future<Map<String, dynamic>> userInfo() async {
-    await _loadToken();
-    if (_token == null) {
-      throw Exception('User is not authenticated');
-    }
-    final response = await http.get(
-      Uri.parse('$baseUrl/profile/'),
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $_token',
-      },
-    );
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to load profile: ${response.body}');
     }
   }
 
@@ -154,27 +136,69 @@ class ApiService {
     }
   }
 
-Future<List<dynamic>> commentView(int postId) async {
-  await _loadToken();
-  if (_token == null) {
-    throw Exception("User is not authenticated");
+  Future<List<dynamic>> commentView(int postId) async {
+    await _loadToken();
+    if (_token == null) {
+      throw Exception("User is not authenticated");
+    }
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/posts/$postId/comments/'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> comments = jsonDecode(response.body);
+      return comments;
+    } else {
+      throw Exception("Failed to load comments: ${response.body}");
+    }
   }
 
-  final response = await http.get(
-    Uri.parse('$baseUrl/posts/$postId/comments/'),
-    headers: <String, String>{
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $_token',
-    },
-  );
-
-  if (response.statusCode == 200) {
-    List<dynamic> comments = jsonDecode(response.body);
-    return comments;
-  } else {
-    throw Exception("Failed to load comments: ${response.body}");
+  Future<Map<String, dynamic>> profilePage() async {
+    await _loadToken();
+    if (_token == null) {
+      throw Exception("Unable to find the user");
+    }
+    final response = await http
+        .get(Uri.parse("$baseUrl/profile/"), headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $_token'
+    });
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data;
+    } else {
+      throw Exception("Unable to find User");
+    }
   }
-}
 
+  Future<Map<String, dynamic>> writeComment(String comment, int postId) async {
+    try {
+      await _loadToken();
+      if (_token == null) {
+        throw Exception("User is not authenticated");
+      }
+      final response = await http.post(
+        Uri.parse('$baseUrl/posts/$postId/comments/'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_token',
+        },
+        body: jsonEncode({'comment': comment}),
+      );
 
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        return data; // Return the response data, which includes the success message
+      } else {
+        throw Exception("Failed to write comment: ${response.body}");
+      }
+    } catch (e) {
+      throw Exception("Failed to write comment: $e");
+    }
+  }
 }

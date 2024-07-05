@@ -1,3 +1,4 @@
+import 'package:agrotech_app/screen/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:agrotech_app/api.dart'; // Adjust import as needed
 import 'package:agrotech_app/screen/comment.dart'; // Adjust import as needed
@@ -13,6 +14,7 @@ class NetworkPage extends StatefulWidget {
 class _NetworkPageState extends State<NetworkPage> {
   final ApiService _apiService = ApiService();
   List<dynamic> posts = [];
+  List<bool> likedState = [];
 
   @override
   void initState() {
@@ -25,6 +27,7 @@ class _NetworkPageState extends State<NetworkPage> {
       final postsData = await _apiService.postAll();
       setState(() {
         posts = postsData;
+        likedState = List<bool>.filled(posts.length, false);
       });
     } catch (e) {
       print('Failed to fetch posts: $e');
@@ -49,7 +52,10 @@ class _NetworkPageState extends State<NetworkPage> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => ProfilePage()));
+            },
             icon: Icon(Icons.person, color: Colors.black),
             iconSize: 30,
           ),
@@ -131,6 +137,7 @@ class _NetworkPageState extends State<NetworkPage> {
                       itemCount: posts.length,
                       itemBuilder: (context, index) {
                         var post = posts[index];
+                        
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 16.0),
                           child: Container(
@@ -220,10 +227,16 @@ class _NetworkPageState extends State<NetworkPage> {
                                   children: [
                                     ActionButton(
                                       icon: Icons.thumb_up,
-                                      color: Colors.black,
+                                      color: likedState.length > index &&
+                                              likedState[index]
+                                          ? Colors.blue
+                                          : Colors.black,
                                       label: "Like",
                                       onTap: () {
-                                        setState(() {});
+                                        setState(() {
+                                          likedState[index] =
+                                              !likedState[index];
+                                        });
                                       },
                                     ),
                                     ActionButton(
@@ -235,7 +248,7 @@ class _NetworkPageState extends State<NetworkPage> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (_) => CommentPage(
-                                              postId: post['id']??0,
+                                              postId: post['id'] ?? 0,
                                             ),
                                           ),
                                         );
