@@ -201,4 +201,64 @@ class ApiService {
       throw Exception("Failed to write comment: $e");
     }
   }
+
+  Future<Map<String, dynamic>> videoUpload(String caption, File? videos) async {
+    try {
+      await _loadToken();
+      if (_token == null) {
+        throw Exception('User is not authenticated');
+      }
+
+      var request =
+          http.MultipartRequest('POST', Uri.parse('$baseUrl/videosUpload/'));
+      request.headers['Authorization'] = 'Bearer $_token';
+      request.headers['Content-Type'] = 'multipart/form-data';
+
+      request.fields['caption'] = caption;
+
+      if (videos != null) {
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'video',
+            await videos.readAsBytes(),
+            filename: videos.path.split('/').last,
+            
+          ),
+        );
+      }
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        final responseBody = await response.stream.bytesToString();
+        return {'status': 'success', 'data': jsonDecode(responseBody)};
+      } else {
+        final responseBody = await response.stream.bytesToString();
+        return {
+          'status': 'failed',
+          'message': response.reasonPhrase,
+          'response': responseBody
+        };
+      }
+    } catch (e) {
+      throw Exception('Error uploading video: $e');
+    }
+  }
+
+  Future<List<dynamic>> allVideos() async {
+    await _loadToken();
+    if (_token == null) {
+      throw Exception("Unauthorized User");
+    }
+    final request = await http
+        .get(Uri.parse('$baseUrl/videosall/'), headers: <String, String>{
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $_token',
+    });
+    if (request.statusCode == 200) {
+      return jsonDecode(request.body);
+    } else {
+      throw Exception("Error ${request.body}");
+    }
+  }
 }

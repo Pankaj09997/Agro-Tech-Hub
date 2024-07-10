@@ -28,6 +28,7 @@ class _PostPageState extends State<PostPage> {
     if (pickedFile != null) {
       setState(() {
         _selectedImage = File(pickedFile.path);
+        print('$_selectedImage');
         _selectedFile = null;
       });
     } else {
