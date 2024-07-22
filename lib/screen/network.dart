@@ -1,6 +1,7 @@
-import 'package:agrotech_app/screen/profile.dart';
+import 'package:agrotech_app/colors/Colors.dart';
 import 'package:flutter/material.dart';
 import 'package:agrotech_app/api.dart'; // Adjust import as needed
+import 'package:agrotech_app/screen/profile.dart';
 import 'package:agrotech_app/screen/comment.dart'; // Adjust import as needed
 import 'package:agrotech_app/screen/postpage.dart'; // Adjust import as needed
 
@@ -38,14 +39,15 @@ class _NetworkPageState extends State<NetworkPage> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: Text("Networking"),
-        backgroundColor: Colors.white,
+        backgroundColor: colorsPallete.appBarColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: theme.iconTheme.color ?? Colors.black),
           onPressed: () {
             Navigator.pushReplacementNamed(context, '/home');
           },
@@ -56,13 +58,13 @@ class _NetworkPageState extends State<NetworkPage> {
               Navigator.push(
                   context, MaterialPageRoute(builder: (_) => ProfilePage()));
             },
-            icon: Icon(Icons.person, color: Colors.black),
+            icon: Icon(Icons.person, color: theme.iconTheme.color ?? Colors.black),
             iconSize: 30,
           ),
           SizedBox(width: 10),
           IconButton(
             onPressed: () {},
-            icon: Icon(Icons.settings, color: Colors.black),
+            icon: Icon(Icons.notifications, color: theme.iconTheme.color ?? Colors.black),
             iconSize: 30,
           ),
         ],
@@ -77,11 +79,11 @@ class _NetworkPageState extends State<NetworkPage> {
                 padding: const EdgeInsets.all(16.0),
                 margin: const EdgeInsets.only(bottom: 16.0),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: theme.shadowColor.withOpacity(0.1),
                       spreadRadius: 1,
                       blurRadius: 5,
                       offset: Offset(0, 3),
@@ -112,13 +114,13 @@ class _NetworkPageState extends State<NetworkPage> {
                       children: [
                         ActionButton(
                           icon: Icons.file_present,
-                          color: Colors.black,
+                          color: theme.iconTheme.color ?? Colors.black,
                           label: "File",
                           onTap: () {},
                         ),
                         ActionButton(
                           icon: Icons.photo,
-                          color: Colors.black,
+                          color: theme.iconTheme.color ?? Colors.black,
                           label: "Photos",
                           onTap: () {},
                         ),
@@ -143,11 +145,11 @@ class _NetworkPageState extends State<NetworkPage> {
                           child: Container(
                             padding: const EdgeInsets.all(16.0),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: theme.cardColor,
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
+                                  color: theme.shadowColor.withOpacity(0.1),
                                   spreadRadius: 1,
                                   blurRadius: 5,
                                   offset: Offset(0, 3),
@@ -172,17 +174,17 @@ class _NetworkPageState extends State<NetworkPage> {
                                       children: [
                                         Text(
                                           post['author_name'],
-                                          style: TextStyle(
+                                          style: theme.textTheme.bodyText1?.copyWith(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
-                                          ),
+                                          ) ?? TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                         ),
                                         Text(
                                           post['created_at'],
-                                          style: TextStyle(
-                                            color: Colors.grey,
+                                          style: theme.textTheme.bodyText2?.copyWith(
+                                            color: theme.hintColor,
                                             fontSize: 12,
-                                          ),
+                                          ) ?? TextStyle(color: theme.hintColor, fontSize: 12),
                                         ),
                                       ],
                                     ),
@@ -191,7 +193,7 @@ class _NetworkPageState extends State<NetworkPage> {
                                 SizedBox(height: 10),
                                 Text(
                                   post['content'] ?? '',
-                                  style: TextStyle(fontSize: 15),
+                                  style: theme.textTheme.bodyText1,
                                 ),
                                 if (post['image'] != null)
                                   GestureDetector(
@@ -212,7 +214,6 @@ class _NetworkPageState extends State<NetworkPage> {
                                         borderRadius: BorderRadius.circular(16),
                                         child: Image.network(
                                           'http://127.0.0.1:8000${post['image']}',
-                                          // Replace with your actual URL or path
                                           height: height * 0.3,
                                           width: double.infinity,
                                           fit: BoxFit.cover,
@@ -229,8 +230,8 @@ class _NetworkPageState extends State<NetworkPage> {
                                       icon: Icons.thumb_up,
                                       color: likedState.length > index &&
                                               likedState[index]
-                                          ? Colors.blue
-                                          : Colors.black,
+                                          ? theme.colorScheme.secondary
+                                          : theme.iconTheme.color ?? Colors.black,
                                       label: "Like",
                                       onTap: () {
                                         setState(() {
@@ -241,7 +242,7 @@ class _NetworkPageState extends State<NetworkPage> {
                                     ),
                                     ActionButton(
                                       icon: Icons.comment,
-                                      color: Colors.black,
+                                      color: theme.iconTheme.color ?? Colors.black,
                                       label: "Comment",
                                       onTap: () {
                                         Navigator.push(
@@ -256,7 +257,7 @@ class _NetworkPageState extends State<NetworkPage> {
                                     ),
                                     ActionButton(
                                       icon: Icons.share,
-                                      color: Colors.black,
+                                      color: theme.iconTheme.color ?? Colors.black,
                                       label: "Share",
                                       onTap: () {},
                                     ),

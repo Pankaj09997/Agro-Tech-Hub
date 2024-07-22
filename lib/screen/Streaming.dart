@@ -1,5 +1,6 @@
-import 'package:agrotech_app/screen/addVideos.dart';
+import 'package:agrotech_app/api.dart';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 class StreamingSite extends StatefulWidget {
   const StreamingSite({Key? key}) : super(key: key);
@@ -9,97 +10,90 @@ class StreamingSite extends StatefulWidget {
 }
 
 class _StreamingSiteState extends State<StreamingSite> {
-  List<Map<String, String>> videos = List.generate(
-    10,
-    (index) => {
-      'title': 'Video Title $index',
-      'channel': 'Channel Name',
-      'views': '1M views',
-      'time': '1 day ago',
-      'thumbnail': 'assets/streamingsite.jpg',
-      'profile': 'https://via.placeholder.com/150'
-    },
-  );
+  final String baseUrl = 'http://127.0.0.1:8000';
+  bool _isLoading = true;
+  List<Map<String, dynamic>> _videos = [];
+  List<VideoPlayerController> _controllers = [];
+  final ApiService _apiService = ApiService();
 
-  void _addVideo() {
-    setState(() {
-      videos.insert(
-        0,
-        {
-          'title': 'New Video',
-          'channel': 'New Channel',
-          'views': '0 views',
-          'time': 'just now',
-          'thumbnail': 'assets/streamingsite.jpg',
-          'profile': 'https://via.placeholder.com/150'
-        },
+  @override
+  void initState() {
+    super.initState();
+    fetchVideos();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    for (var controller in _controllers) {
+      controller.dispose();
+    }
+  }
+
+  Future<void> fetchVideos() async {
+    try {
+      final videos = await _apiService.allVideos();
+      setState(() {
+        _videos = videos;
+        _isLoading = false;
+        _controllers = List.generate(
+          _videos.length,
+          (index) {
+            final videoUrl = baseUrl + _videos[index]['video'];
+            print('Video URL: $videoUrl'); // Debugging print statement
+            return VideoPlayerController.networkUrl(Uri.parse('videoUrl'));
+          },
+        );
+      });
+
+      // Initialize all controllers
+      for (var controller in _controllers) {
+        await controller.initialize();
+      }
+
+      setState(() {});
+    } catch (e) {
+      print("$e");
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
       );
-    });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Row(
-          children: [
-            const Spacer(),
-            IconButton(
-              icon: const Icon(Icons.add, color: Colors.black),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => AddVideos()),
-                );
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.notifications, color: Colors.black),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.search, color: Colors.black),
-              onPressed: () {},
-            ),
-            const CircleAvatar(
-              backgroundImage: NetworkImage(
-                'https://via.placeholder.com/150',
-              ),
-            ),
-          ],
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
-            ...videos.map((video) {
-              return Column(
-                children: [
-                  Image.asset(
-                    video['thumbnail']!,
-                    height: 200,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                  ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: NetworkImage(video['profile']!),
-                    ),
-                    title: Text(video['title']!),
-                    subtitle: Text(
-                      '${video['channel']} • ${video['views']} • ${video['time']}',
-                    ),
-                  ),
-                  const Divider(),
-                ],
-              );
-            }).toList(),
-          ],
-        ),
-      ),
+      appBar: AppBar(title: Text("Video Streaming")),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : _videos.isEmpty
+              ? Center(child: Text("No Videos Available"))
+              : ListView.builder(
+                  itemCount: _videos.length,
+                  itemBuilder: (context, index) {
+                    final video = _videos[index];
+                    final controller = _controllers[index];
+                    return ListTile(
+                      title: Text(video['caption'] ?? 'No Title'),
+                      subtitle: controller.value.isInitialized
+                          ? AspectRatio(
+                              aspectRatio: controller.value.aspectRatio,
+                              child: VideoPlayer(controller),
+                            )
+                          : Center(child: CircularProgressIndicator()),
+                      onTap: () {
+                        if (controller.value.isPlaying) {
+                          controller.pause();
+                        } else {
+                          controller.play();
+                        }
+                      },
+                    );
+                  },
+                ),
     );
   }
 }

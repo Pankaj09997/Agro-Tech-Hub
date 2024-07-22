@@ -1,6 +1,10 @@
-import 'package:agrotech_app/Service%20Item/serviceitem.dart';
+import 'package:agrotech_app/colors/Colors.dart';
+import 'package:agrotech_app/screen/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:agrotech_app/Service%20Item/serviceitem.dart';
 import 'package:agrotech_app/api.dart';
+import 'package:agrotech_app/cubit/theme_cubit.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -68,19 +72,24 @@ class _HomePageState extends State<HomePage> {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
+        backgroundColor: colorsPallete.appBarColor,
         elevation: 1,
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.person, color: Colors.black),
+            onPressed: () {
+              context.read<ThemeCubit>().toggleTheme();
+            },
+            icon: Icon(Icons.brightness_6),
             iconSize: 30,
           ),
           SizedBox(width: 10),
           IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.settings, color: Colors.black),
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => Settings()));
+            },
+            icon: Icon(Icons.settings),
             iconSize: 30,
           ),
         ],
@@ -105,10 +114,10 @@ class _HomePageState extends State<HomePage> {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       "Welcome, $name",
-                      style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black),
+                      style: Theme.of(context)
+                          .textTheme
+                          .headline5
+                          ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -118,10 +127,10 @@ class _HomePageState extends State<HomePage> {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       "$greetings",
-                      style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black),
+                      style: Theme.of(context)
+                          .textTheme
+                          .headline5
+                          ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -140,8 +149,10 @@ class _HomePageState extends State<HomePage> {
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black),
+                            border: Border.all(
+                                color: Theme.of(context).dividerColor),
                             borderRadius: BorderRadius.circular(16),
+                            color: Theme.of(context).cardColor,
                           ),
                           child: InkWell(
                             onTap: () {
@@ -153,15 +164,17 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 AspectRatio(
                                   aspectRatio: 1.1,
-                                  child: Image.asset(services[index].imageAddress,
+                                  child: Image.asset(
+                                      services[index].imageAddress,
                                       fit: BoxFit.cover),
                                 ),
                                 SizedBox(height: 10),
                                 Text(services[index].name,
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black)),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1
+                                        ?.copyWith(
+                                            fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),

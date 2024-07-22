@@ -36,7 +36,6 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       _token = data['Token']['access'];
-      print(_token);
       await _saveToken(_token!);
       return data;
     } else {
@@ -60,7 +59,7 @@ class ApiService {
     );
     if (response.statusCode == 201) {
       final data = jsonDecode(response.body);
-      _token = data['Token']['access'];
+      _token = data['Token']['C'];
       await _saveToken(_token!);
       return data;
     } else {
@@ -91,15 +90,12 @@ class ApiService {
     if (file != null) {
       request.files.add(
         http.MultipartFile.fromBytes(
-          'file',
+          'pdf',
           await file.readAsBytes(),
           filename: file.path.split('/').last,
         ),
       );
     }
-
-    print('Request fields: ${request.fields}');
-    print('Request files: ${request.files.map((file) => file.filename)}');
 
     var response = await request.send();
 
@@ -202,7 +198,8 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> videoUpload(String caption, File? videos) async {
+  Future<Map<String, dynamic>> videoUpload(
+      String caption, File? videoFile) async {
     try {
       await _loadToken();
       if (_token == null) {
@@ -216,13 +213,15 @@ class ApiService {
 
       request.fields['caption'] = caption;
 
-      if (videos != null) {
+      if (videoFile != null) {
+        //adding the file to the request file
         request.files.add(
+          //convering the file to the bytes which is suitable for using
           http.MultipartFile.fromBytes(
             'video',
-            await videos.readAsBytes(),
-            filename: videos.path.split('/').last,
-            
+            //reading the videos as bytes
+            await videoFile.readAsBytes(),
+            filename: videoFile.path.split('/').last,
           ),
         );
       }
@@ -230,6 +229,7 @@ class ApiService {
       var response = await request.send();
 
       if (response.statusCode == 200) {
+        //changing the videos to string because the data is in bytes
         final responseBody = await response.stream.bytesToString();
         return {'status': 'success', 'data': jsonDecode(responseBody)};
       } else {
@@ -245,20 +245,49 @@ class ApiService {
     }
   }
 
-  Future<List<dynamic>> allVideos() async {
+  Future<List<Map<String, dynamic>>> allVideos() async {
     await _loadToken();
     if (_token == null) {
       throw Exception("Unauthorized User");
     }
-    final request = await http
-        .get(Uri.parse('$baseUrl/videosall/'), headers: <String, String>{
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $_token',
-    });
-    if (request.statusCode == 200) {
-      return jsonDecode(request.body);
+    final response = await http.get(
+      Uri.parse('$baseUrl/videosall/'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      return List<Map<String, dynamic>>.from(data);
     } else {
-      throw Exception("Error ${request.body}");
+      throw Exception("Error ${response.body}");
     }
   }
+
+Future<Map<String, dynamic>> changePassword(String password, String password2) async {
+  await _loadToken();
+  if (_token == null) {
+    throw Exception("User is not authorized");
+  }
+  final response = await http.post(
+    Uri.parse("$baseUrl/changepassword/"),
+    headers: <String, String>{
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $_token',
+    },
+    body: jsonEncode({
+      'password': password,
+      'password2': password2,
+    }),
+  );
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    return data;  // Assuming the API returns a new token on successful password change
+  } else {
+    throw Exception("Unable to change password: ${response.body}");
+  }
+}
+
 }
