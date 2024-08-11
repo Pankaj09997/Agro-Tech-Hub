@@ -58,7 +58,7 @@ class _NetworkPageState extends State<NetworkPage> {
               Navigator.push(
                   context, MaterialPageRoute(builder: (_) => ProfilePage()));
             },
-            icon: Icon(Icons.person, color: theme.iconTheme.color ?? Colors.black),
+            icon: Icon(Icons.message, color: theme.iconTheme.color ?? Colors.black),
             iconSize: 30,
           ),
           SizedBox(width: 10),
