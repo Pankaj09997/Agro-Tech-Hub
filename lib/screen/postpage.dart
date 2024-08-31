@@ -105,6 +105,9 @@ class _PostPageState extends State<PostPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text('Create Post'),
+          iconTheme: IconThemeData(
+            color: Colors.black
+          ),
           actions: [
             TextButton(
               onPressed: _uploadPost,

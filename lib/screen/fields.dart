@@ -7,6 +7,7 @@ class Textfield extends StatefulWidget {
   final IconButton? icon;
   final bool obsecureText;
   final String Function(String?)? validator;
+  final Icon ?prefixIcon;
 
   final RegExp? regExp;
 
@@ -18,6 +19,7 @@ class Textfield extends StatefulWidget {
     this.obsecureText = true,
     this.regExp,
     this.validator,
+    this.prefixIcon
   }) : super(key: key);
 
   @override
@@ -31,19 +33,21 @@ class _TextfieldState extends State<Textfield> {
     return TextFormField(
       obscureText: widget.obsecureText,
       controller: widget.textEditingController,
-      validator:widget.validator?? (value) {
-        if (value == null || value.isEmpty) {
-          return 'You cannot leave this field this empty';
-        }
-        if (widget.regExp != null && !widget.regExp!.hasMatch(value)) {
-          return 'Invalid E-mail Format ';
-        }
-        if (value != _passwordcontroller) {
-        } else {
-          return null;
-        }
-      },
+      validator: widget.validator ??
+          (value) {
+            if (value == null || value.isEmpty) {
+              return 'You cannot leave this field this empty';
+            }
+            if (widget.regExp != null && !widget.regExp!.hasMatch(value)) {
+              return 'Invalid E-mail Format ';
+            }
+            if (value != _passwordcontroller) {
+            } else {
+              return null;
+            }
+          },
       decoration: InputDecoration(
+          prefixIcon: widget.prefixIcon,
           hintText: widget.hintString,
           suffixIcon: widget.icon,
           border: OutlineInputBorder(

@@ -1,4 +1,5 @@
 import 'package:agrotech_app/colors/Colors.dart';
+import 'package:agrotech_app/screen/messenger/messenging.dart';
 import 'package:flutter/material.dart';
 import 'package:agrotech_app/api.dart'; // Adjust import as needed
 import 'package:agrotech_app/screen/profile.dart';
@@ -56,9 +57,9 @@ class _NetworkPageState extends State<NetworkPage> {
           IconButton(
             onPressed: () {
               Navigator.push(
-                  context, MaterialPageRoute(builder: (_) => ProfilePage()));
+                  context, MaterialPageRoute(builder: (_) => MessengingScreen()));
             },
-            icon: Icon(Icons.message, color: theme.iconTheme.color ?? Colors.black),
+            icon: Icon(Icons.messenger, color: theme.iconTheme.color ?? Colors.black),
             iconSize: 30,
           ),
           SizedBox(width: 10),

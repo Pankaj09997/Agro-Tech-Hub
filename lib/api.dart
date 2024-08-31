@@ -6,14 +6,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ApiService {
   String? _token;
   final String baseUrl = "http://127.0.0.1:8000/api";
-
+// shared preferences to store the token
   Future<void> _loadToken() async {
+    // instance to get the access to the shared preferences storage
     final prefs = await SharedPreferences.getInstance();
     _token = prefs.getString('jwt_token');
   }
 
   Future<void> _saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
+    // jwt_token is the key under which token is stored whenever retrireving the token we just need to use key i.e is 'jwt_token'
     await prefs.setString('jwt_token', token);
   }
 
@@ -59,7 +61,7 @@ class ApiService {
     );
     if (response.statusCode == 201) {
       final data = jsonDecode(response.body);
-      _token = data['Token']['C'];
+      _token = data['Token']['access'];
       await _saveToken(_token!);
       return data;
     } else {
@@ -78,7 +80,9 @@ class ApiService {
     request.fields['content'] = post;
 
     if (image != null) {
+      // adding something to the request
       request.files.add(
+        //convert the added itm to bytes for easy transfomation
         http.MultipartFile.fromBytes(
           'image',
           await image.readAsBytes(),
@@ -266,28 +270,46 @@ class ApiService {
     }
   }
 
-Future<Map<String, dynamic>> changePassword(String password, String password2) async {
-  await _loadToken();
-  if (_token == null) {
-    throw Exception("User is not authorized");
+  Future<Map<String, dynamic>> changePassword(
+      String password, String password2) async {
+    await _loadToken();
+    if (_token == null) {
+      throw Exception("User is not authorized");
+    }
+    final response = await http.post(
+      Uri.parse("$baseUrl/changepassword/"),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $_token',
+      },
+      body: jsonEncode({
+        'password': password,
+        'password2': password2,
+      }),
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data; // Assuming the API returns a new token on successful password change
+    } else {
+      throw Exception("Unable to change password: ${response.body}");
+    }
   }
-  final response = await http.post(
-    Uri.parse("$baseUrl/changepassword/"),
-    headers: <String, String>{
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $_token',
-    },
-    body: jsonEncode({
-      'password': password,
-      'password2': password2,
-    }),
-  );
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    return data;  // Assuming the API returns a new token on successful password change
-  } else {
-    throw Exception("Unable to change password: ${response.body}");
-  }
-}
 
+  Future<List<dynamic>> fetchUsers() async {
+    await _loadToken();
+    if (_token == null) {
+      throw Exception("User is not authenticated");
+    }
+    final response = await http.get(Uri.parse("$baseUrl/usersall/"),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_token'
+        });
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data;
+    } else {
+      throw Exception("Unable to Fetch the users");
+    }
+  }
 }
