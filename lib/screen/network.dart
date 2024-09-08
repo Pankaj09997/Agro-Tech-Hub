@@ -57,7 +57,7 @@ class _NetworkPageState extends State<NetworkPage> {
           IconButton(
             onPressed: () {
               Navigator.push(
-                  context, MaterialPageRoute(builder: (_) => MessengingScreen()));
+                  context, MaterialPageRoute(builder: (_) => ChatPage()));
             },
             icon: Icon(Icons.messenger, color: theme.iconTheme.color ?? Colors.black),
             iconSize: 30,

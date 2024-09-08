@@ -1,100 +1,103 @@
 import 'package:agrotech_app/api.dart';
-import 'package:agrotech_app/colors/Colors.dart';
-import 'package:agrotech_app/screen/fields.dart';
 import 'package:flutter/material.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
-class MessengingScreen extends StatefulWidget {
-  const MessengingScreen({super.key});
+class ChatPage extends StatefulWidget {
+  ChatPage({Key? key}) : super(key: key);
 
   @override
-  State<MessengingScreen> createState() => _MessengingScreenState();
+  _ChatPageState createState() => _ChatPageState();
 }
 
-class _MessengingScreenState extends State<MessengingScreen> {
-  final ApiService _apiService = ApiService();
-  late Future<List<dynamic>> _users;
+class _ChatPageState extends State<ChatPage> {
+  late WebSocketChannel channel;
+  late ApiService apiService;
+  String? token;
+  final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
-    _users = _apiService.fetchUsers();
     super.initState();
+    apiService = ApiService();
+    _initWebSocket();
   }
 
-  // Function to filter users based on search query
-  List<dynamic> _searchquery(List<dynamic> users, String query) {
-    if (query.isEmpty) {
-      return users;
+  Future<void> _initWebSocket() async {
+    token = await apiService.getToken(); // Fetch the token from ApiService
+    if (token != null) {
+      channel = WebSocketChannel.connect(
+        Uri.parse('ws://localhost:8000/ws/wsc/?token=$token'),
+      );
+      setState(() {});
     } else {
-      return users.where((user) {
-        final name = user['name'].toString().toLowerCase();
-        final email = user['email'].toString().toLowerCase();
-        final searchLower = query.toLowerCase();
-        return name.contains(searchLower) || email.contains(searchLower);
-      }).toList();
+      // Handle the case when the token is not available
+      print('Token not available');
     }
   }
 
-  final TextEditingController _nameController = TextEditingController();
+  @override
+  void dispose() {
+    channel.sink.close();
+    super.dispose();
+  }
+
+  void _sendMessage(String message) {
+    if (message.isNotEmpty) {
+      channel.sink.add(message); // Send the message through WebSocket
+      _controller.clear(); // Clear the text field
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Messenging"),
-        backgroundColor: colorsPallete.appBarColor,
-        iconTheme: const IconThemeData(
-          color: Colors.black,
-        ),
+        title: Text('Chat'),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search),
-                hintText: "Search",
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (value) {
-                setState(() {});
-              },
-            ),
-          ),
-          // Use Flexible here instead of Expanded
-          Flexible(
-            child: FutureBuilder<List<dynamic>>(
-              future: _users,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Error: ${snapshot.error}'),
-                  );
-                } else {
-                  // When the data is loaded
-                  final users =
-                      _searchquery(snapshot.data!, _nameController.text);
-                  print("users are $users");
-                  return ListView.builder(
-                    itemCount: users.length,
-                    itemBuilder: (context, index) {
-                      final user = users[index];
-                      return ListTile(
-                        title: Text(user['name']),
-                        subtitle: Text(user['email']),
-                        onTap: () {},
-                      );
+      body: token == null
+          ? Center(child: Text('No token available'))
+          : Column(
+              children: [
+                Expanded(
+                  child: StreamBuilder(
+                    stream: channel.stream,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return ListView(
+                          children: [
+                            ListTile(
+                              title: Text(snapshot.data.toString()),
+                            ),
+                          ],
+                        );
+                      }
+                      return Center(child: Text('No messages'));
                     },
-                  );
-                }
-              },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _controller,
+                          onSubmitted: _sendMessage, // Send message when submitted
+                          decoration: InputDecoration(
+                            labelText: 'Send a message',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.send),
+                        onPressed: () => _sendMessage(_controller.text), // Send message when icon button is pressed
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:agrotech_app/api.dart';
+import 'package:agrotech_app/marketpalce/citizenverify.dart';
 import 'package:agrotech_app/screen/Advice.dart';
 import 'package:agrotech_app/screen/Streaming.dart';
 import 'package:agrotech_app/screen/Test.dart';
@@ -11,9 +12,8 @@ import 'package:agrotech_app/screen/splashscreen/networksplash.dart';
 import 'package:flutter/material.dart';
 
 class RouteGenerator {
-    static final ApiService _apiService = ApiService();
+  static final ApiService _apiService = ApiService();
   static Route<dynamic> generateRoute(RouteSettings settings) {
-    
     switch (settings.name) {
       case "/":
         return MaterialPageRoute(builder: (_) => SplashPage());
@@ -21,28 +21,34 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => Login());
       case "/home":
         return MaterialPageRoute(builder: (_) => HomePage());
-       case "/network":
+      case "/network":
         return MaterialPageRoute(builder: (_) => NetworkSplash());
-               case "/stream":
+      case "/stream":
         return MaterialPageRoute(builder: (_) => StreamingSite());
-               case "/test":
+      case "/test":
         return MaterialPageRoute(builder: (_) => Test());
-               case "/advice":
+      case "/advice":
         return MaterialPageRoute(builder: (_) => Advice());
 
+      case "/citizenshipverify":
+        return MaterialPageRoute(
+            builder: (_) => CitizenshipVerificationScreen());
 
       default:
         return MaterialPageRoute(builder: (_) => Error());
     }
   }
 }
+
 class Error extends StatelessWidget {
   const Error({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Error"),),
+      appBar: AppBar(
+        title: Text("Error"),
+      ),
     );
   }
 }

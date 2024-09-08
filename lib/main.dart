@@ -1,10 +1,15 @@
+import 'package:agrotech_app/bots/consts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:agrotech_app/Routes/routes.dart';
 import 'package:agrotech_app/screen/splashscreen/splash.dart';
 import 'package:agrotech_app/cubit/theme_cubit.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 
 void main() {
+      Gemini.init(
+    apiKey: GEMINI_API_KEY,
+  );
   runApp(const MyApp());
 }
 
