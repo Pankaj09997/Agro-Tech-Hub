@@ -586,7 +586,7 @@ Future<Map<String, dynamic>> updateProduct(int productId, String name,
     if (response.statusCode == 204) {
       return {'status': 'success', 'message': 'Product deleted successfully'};
     } else {
-      throw Exception('Failed to delete product: ${response.body}');
+      throw Exception('Failed to delete the product: ${response.body}');
     }
   }
 }
