@@ -42,17 +42,21 @@ class _AnimatedChartsPageState extends State<AnimatedChartsPage> {
   }
 
   void _startChartAnimation() {
-    _timer = Timer.periodic(Duration(seconds: 2), (timer) {
+    _timer = Timer.periodic(Duration(seconds: 3), (timer) {
       setState(() {
-        isRadarChart = !isRadarChart;
-        if (!isRadarChart) {
-          isLineChart = !isLineChart;
-          if (!isLineChart) {
-            isPieChart = !isPieChart;
-            if (!isPieChart) {
-              isScatterChart = !isScatterChart;
-            }
-          }
+        // Cycle through chart types in sequence
+        if (isRadarChart) {
+          isRadarChart = false;
+          isLineChart = true;
+        } else if (isLineChart) {
+          isLineChart = false;
+          isPieChart = true;
+        } else if (isPieChart) {
+          isPieChart = false;
+          isScatterChart = true;
+        } else if (isScatterChart) {
+          isScatterChart = false;
+          isRadarChart = true;
         }
       });
     });
@@ -114,7 +118,6 @@ class _AnimatedChartsPageState extends State<AnimatedChartsPage> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Center(
@@ -123,14 +126,14 @@ class _AnimatedChartsPageState extends State<AnimatedChartsPage> {
             width: width * 0.9,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              color: isDarkMode ? Colors.black : Colors.black,
+              color: isDarkMode ? Colors.grey[850] : Colors.grey[300],
             ),
             child: expenses.isEmpty
                 ? Center(child: CircularProgressIndicator())
                 : Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: AnimatedSwitcher(
-                      duration: Duration(seconds: 1),
+                      duration: Duration(milliseconds: 500),
                       child: isRadarChart && _generateRadarEntries().length >= 3
                           ? RadarChart(
                               key: ValueKey('RadarChart'),
@@ -138,14 +141,13 @@ class _AnimatedChartsPageState extends State<AnimatedChartsPage> {
                                 radarShape: RadarShape.polygon,
                                 dataSets: [
                                   RadarDataSet(
-                                    fillColor: Colors.blue.withOpacity(0.2),
+                                    fillColor: Colors.blue.withOpacity(0.3),
                                     borderColor: Colors.blue,
                                     borderWidth: 2,
                                     dataEntries: _generateRadarEntries(),
                                   ),
                                 ],
                                 radarBorderData: BorderSide.none,
-                                titleTextStyle: TextStyle(fontSize: 14),
                                 radarBackgroundColor:
                                     Colors.white.withOpacity(0.1),
                                 tickCount: 5,
@@ -163,7 +165,6 @@ class _AnimatedChartsPageState extends State<AnimatedChartsPage> {
                                         isCurved: true,
                                         color: Colors.blue,
                                         barWidth: 3,
-                                        isStrokeCapRound: true,
                                         belowBarData: BarAreaData(
                                           show: true,
                                           color: Colors.blue.withOpacity(0.3),
@@ -178,7 +179,6 @@ class _AnimatedChartsPageState extends State<AnimatedChartsPage> {
                                         sideTitles: SideTitles(showTitles: true),
                                       ),
                                     ),
-                                    gridData: FlGridData(show: false),
                                   ),
                                 )
                               : isPieChart
@@ -186,7 +186,6 @@ class _AnimatedChartsPageState extends State<AnimatedChartsPage> {
                                       key: ValueKey('PieChart'),
                                       PieChartData(
                                         sections: _generatePieSections(),
-                                        borderData: FlBorderData(show: false),
                                         sectionsSpace: 0,
                                         centerSpaceRadius: 50,
                                       ),
@@ -198,10 +197,12 @@ class _AnimatedChartsPageState extends State<AnimatedChartsPage> {
                                         borderData: FlBorderData(show: false),
                                         titlesData: FlTitlesData(
                                           bottomTitles: AxisTitles(
-                                            sideTitles: SideTitles(showTitles: true),
+                                            sideTitles: SideTitles(
+                                                showTitles: true),
                                           ),
                                           leftTitles: AxisTitles(
-                                            sideTitles: SideTitles(showTitles: true),
+                                            sideTitles: SideTitles(
+                                                showTitles: true),
                                           ),
                                         ),
                                       ),

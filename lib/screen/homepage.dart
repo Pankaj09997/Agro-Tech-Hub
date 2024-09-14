@@ -13,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:agrotech_app/Service%20Item/serviceitem.dart';
 import 'package:agrotech_app/api.dart';
 import 'package:agrotech_app/cubit/theme_cubit.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
 
 
@@ -63,13 +64,18 @@ class _HomePageState extends State<HomePage> {
   final List<ServiceItem> services = [
     ServiceItem(
       name: "Network",
-      imageAddress: "assets/network.jpg",
+      imageAddress: "assets/network.svg",
       routeAddress: '/network',
     ),
     ServiceItem(
       name: "Market Place",
-      imageAddress: "assets/marketplace.jpg",
+      imageAddress: "assets/market.svg",
       routeAddress: '/citizenshipverify',
+    ),
+        ServiceItem(
+      name: " Video",
+      imageAddress: "assets/video.svg",
+      routeAddress: '/video',
     ),
 
   ];
@@ -121,6 +127,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.black,
         child: CircleAvatar(
           backgroundImage: AssetImage("assets/bots.jpg"),
         ),
@@ -283,7 +290,8 @@ class _HomePageState extends State<HomePage> {
                             width: width * 0.3,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              color: isDarkMode ? Colors.black : Colors.black,
+                              color: Colors.black
+                              
                             ),
                             child: AnimatedChartsPage(),
                           ),
@@ -318,9 +326,11 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 AspectRatio(
                                   aspectRatio: 1.1,
-                                  child: Image.asset(
+                                  child: SvgPicture.asset(
                                     services[index].imageAddress,
-                                    fit: BoxFit.cover,
+                                    
+                                    height: 5,
+                                    width: 5,
                                   ),
                                 ),
                                 SizedBox(height: 10),
