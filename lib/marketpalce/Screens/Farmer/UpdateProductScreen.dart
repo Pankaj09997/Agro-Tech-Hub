@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:agrotech_app/api.dart';
+import 'package:image_picker/image_picker.dart';
 
 class UpdateProductScreen extends StatefulWidget {
   final int productId;
@@ -66,13 +67,12 @@ class _UpdateProductScreenState extends State<UpdateProductScreen> {
   }
 
   Future<void> _pickImage() async {
-    // Implement image picking logic here (e.g., using image_picker package)
-    // Example:
-    // final picker = ImagePicker();
-    // final pickedFile = await picker.getImage(source: ImageSource.gallery);
-    // setState(() {
-    //   _image = File(pickedFile!.path);
-    // });
+
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _image = File(pickedFile!.path);
+    });
   }
 
   @override

@@ -60,6 +60,8 @@ dependencies:
   get: ^4.6.6
   flutter_lints: ^3.0.0
   share_plus: ^7.2.2
+  jwt_decoder: ^2.0.1
+  zego_uikit_prebuilt_video_conference: ^2.9.1
   
 
 dev_dependencies:

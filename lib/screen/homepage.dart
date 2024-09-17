@@ -5,7 +5,6 @@ import 'package:agrotech_app/bots/chatpage.dart';
 import 'package:agrotech_app/colors/Colors.dart';
 import 'package:agrotech_app/screen/Expense/Expenses.dart';
 import 'package:agrotech_app/screen/flchart.dart';
-import 'package:agrotech_app/screen/messenger/messenging.dart';
 import 'package:agrotech_app/screen/settings.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';

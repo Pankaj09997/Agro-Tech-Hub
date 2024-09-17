@@ -34,8 +34,8 @@ class _VideoCallState extends State<VideoCall> {
     });
     _client = AgoraClient(
         agoraConnectionData: AgoraConnectionData(
-          appId: "e43d4dac290c4052b65a7a41678d596a",
-          tempToken: "007eJxTYGCNvHvitEDNNFEROet9Zd7zNglvK1q5Qsfcxcc3ka+ft1aBIdXEOMUkJTHZyNIg2cTA1CjJzDTRPNHE0MzcIsXU0ixxwtyHaQ2BjAx+Oy4zMTJAIIjPwlCSWlzCwAAAbwIdHw==",
+          appId: "70fad335b0284a3f88dadd0421699dec",
+          tempToken: "007eJxTYBDJXaV0a4693guLhPKYDZfiPA/umBttf/jYgSBxmdnNBycoMJgbpCWmGBubJhkYWZgkGqdZWKQkpqQYmBgZmllapqQmN71/ktYQyMiw+P5mVkYGCATxWRhKUotLGBgAcBEhKg==",
           channelName: widget.channelName,
         ),
         enabledPermission: [

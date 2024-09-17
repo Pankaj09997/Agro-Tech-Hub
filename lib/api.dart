@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
+import 'package:get/get_connect.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   String? _token;
+  int? userId;
   final String baseUrl = "http://127.0.0.1:8000/api";
 // shared preferences to store the token
   Future<void> _loadToken() async {
@@ -160,18 +162,40 @@ class ApiService {
     }
   }
 
+  // Future<Map<String, dynamic>> profilePage() async {
+  //   await _loadToken();
+  //   if (_token == null) {
+  //     throw Exception("Unable to find the user");
+  //   }
+  //   final response = await http
+  //       .get(Uri.parse("$baseUrl/profile/"), headers: <String, String>{
+  //     'Content-Type': 'application/json; charset=UTF-8',
+  //     'Authorization': 'Bearer $_token'
+  //   });
+  //   if (response.statusCode == 200) {
+  //     final data = jsonDecode(response.body);
+  //     return data;
+  //   } else {
+  //     throw Exception("Unable to find User");
+  //   }
+  // }
   Future<Map<String, dynamic>> profilePage() async {
     await _loadToken();
     if (_token == null) {
       throw Exception("Unable to find the user");
     }
-    final response = await http
-        .get(Uri.parse("$baseUrl/profile/"), headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer $_token'
-    });
+    final response = await http.get(
+      Uri.parse("$baseUrl/profile/"),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $_token'
+      },
+    );
+
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      userId = data['id'];
+      print("$userId");
       return data;
     } else {
       throw Exception("Unable to find User");
@@ -441,7 +465,7 @@ class ApiService {
     }
 
     final response = await http.get(
-      Uri.parse('$baseUrl/products/'),
+      Uri.parse('$baseUrl/farmerlist/'),
       headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $_token',
@@ -463,7 +487,7 @@ class ApiService {
     }
 
     final response = await http.get(
-      Uri.parse('$baseUrl/products/$productId/'),
+      Uri.parse('$baseUrl/detail/$productId/'),
       headers: <String, String>{
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $_token',
@@ -477,98 +501,94 @@ class ApiService {
     }
   }
 
-Future<Map<String, dynamic>> createProduct(
-    String name, File? image, String description, double price) async {
-  await _loadToken(); // Load the JWT token
-  if (_token == null) {
-    throw Exception('User is not authenticated');
-  }
+  Future<Map<String, dynamic>> createProduct(
+      String name, File? image, String description, double price) async {
+    await _loadToken(); // Load the JWT token
+    if (_token == null) {
+      throw Exception('User is not authenticated');
+    }
 
-  // Create a multipart request to send both text data and the image file
-  var request = http.MultipartRequest(
-    'POST',
-    Uri.parse('$baseUrl/products/add/'),
-  );
-
-  // Set headers, including authorization token
-  request.headers['Authorization'] = 'Bearer $_token';
-  request.headers['Content-Type'] = 'multipart/form-data';
-
-  // Add fields to the request (name, description, price)
-  request.fields['name'] = name;
-  request.fields['description'] = description;
-  request.fields['price'] = price.toString();
-
-  // Add the image file to the request if it exists
-  if (image != null) {
-    request.files.add(
-      await http.MultipartFile.fromPath(
-        'productimage', // Ensure this matches the Django field
-        image.path,
-      ),
+    // Create a multipart request to send both text data and the image file
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse('$baseUrl/products/add/'),
     );
-  }
 
-  // Send the request and wait for a response
-  var response = await request.send();
+    // Set headers, including authorization token
+    request.headers['Authorization'] = 'Bearer $_token';
+    request.headers['Content-Type'] = 'multipart/form-data';
 
-  // Read the response and handle it
-  final responseBody = await response.stream.bytesToString();
-  if (response.statusCode == 201) {
-    // If the request is successful, return the decoded response
-    return {'status': 'success', 'data': jsonDecode(responseBody)};
-  } else {
-    // If the request fails, return the error response
-    return {
-      'status': 'failed',
-      'message': response.reasonPhrase,
-      'response': responseBody
-    };
-  }
-}
+    request.fields['name'] = name;
+    request.fields['description'] = description;
+    request.fields['price'] = price.toString();
 
+    if (image != null) {
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'productimage', // Ensure this matches the Django field
+          image.path,
+        ),
+      );
+    }
 
-Future<Map<String, dynamic>> updateProduct(int productId, String name,
-    File? image, String description, double price) async {
-  await _loadToken();
-  if (_token == null) {
-    throw Exception('User is not authenticated');
-  }
+    // Send the request and wait for a response
+    var response = await request.send();
 
-  var request = http.MultipartRequest(
-      'PUT', Uri.parse('$baseUrl/products/$productId/'));  // Correct URL path
-  request.headers['Authorization'] = 'Bearer $_token';
-  request.headers['Content-Type'] = 'multipart/form-data';
-
-  request.fields['name'] = name;
-  request.fields['description'] = description;
-  request.fields['price'] = price.toString();
-
-  if (image != null) {
-    request.files.add(
-      http.MultipartFile.fromBytes(
-        'productimage',
-        await image.readAsBytes(),
-        filename: image.path.split('/').last,
-      ),
-    );
-  }
-
-  var response = await request.send();
-
-  if (response.statusCode == 200) {
+    // Read the response and handle it
     final responseBody = await response.stream.bytesToString();
-    return {'status': 'success', 'data': jsonDecode(responseBody)};
-  } else {
-    final responseBody = await response.stream.bytesToString();
-    return {
-      'status': 'failed',
-      'message': response.reasonPhrase,
-      'response': responseBody
-    };
+    if (response.statusCode == 201) {
+      // If the request is successful, return the decoded response
+      return {'status': 'success', 'data': jsonDecode(responseBody)};
+    } else {
+      // If the request fails, return the error response
+      return {
+        'status': 'failed',
+        'message': response.reasonPhrase,
+        'response': responseBody
+      };
+    }
   }
-}
 
+  Future<Map<String, dynamic>> updateProduct(int productId, String name,
+      File? image, String description, double price) async {
+    await _loadToken();
+    if (_token == null) {
+      throw Exception('User is not authenticated');
+    }
+
+    var request = http.MultipartRequest(
+        'PUT', Uri.parse('$baseUrl/detail/$productId/')); // Correct URL path
+    request.headers['Authorization'] = 'Bearer $_token';
+    request.headers['Content-Type'] = 'multipart/form-data';
+
+    request.fields['name'] = name;
+    request.fields['description'] = description;
+    request.fields['price'] = price.toString();
+
+    if (image != null) {
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'productimage',
+          await image.readAsBytes(),
+          filename: image.path.split('/').last,
+        ),
+      );
+    }
+
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      final responseBody = await response.stream.bytesToString();
+      return {'status': 'success', 'data': jsonDecode(responseBody)};
+    } else {
+      final responseBody = await response.stream.bytesToString();
+      return {
+        'status': 'failed',
+        'message': response.reasonPhrase,
+        'response': responseBody
+      };
+    }
+  }
 
   Future<Map<String, dynamic>> deleteProduct(int productId) async {
     await _loadToken();
@@ -589,6 +609,70 @@ Future<Map<String, dynamic>> updateProduct(int productId, String name,
       throw Exception('Failed to delete the product: ${response.body}');
     }
   }
+
+  Future<Map<String, dynamic>> BuyerDetailView(int productId) async {
+    await _loadToken();
+    if (_token == null) {
+      throw Exception("Unauthorized user");
+    }
+    final response = await http.get(
+        Uri.parse("$baseUrl/buyerdetail/$productId/"),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_token'
+        });
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data;
+    } else {
+      throw Exception("Unable to fetch the data ${response.body}");
+    }
+  }
+
+  Future<List<dynamic>> fetchCartItems() async {
+    await _loadToken();
+    if (_token == null) {
+      throw Exception("Unauthorized user");
+    }
+    final response = await http.get(
+        Uri.parse(
+          "$baseUrl/getcart/",
+        ),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_token'
+        });
+    if (response.statusCode == 200) {
+      final data = jsonDecode((response.body));
+      print('$data');
+
+      for (var item in data) {
+        print('Product name: ${item["item"]["name"]}');
+      }
+
+      return data;
+    } else {
+      throw Exception("Unable to fetch data");
+    }
+  }
+
+  Future<Map<String, dynamic>> addtocart(int productId, int quantity) async {
+    await _loadToken();
+    if (_token == null) {
+      throw Exception("Unable to load data");
+    }
+    final response = await http.post(Uri.parse("$baseUrl/addtocart/"),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $_token'
+        },
+        body: jsonEncode({'id': productId, 'quantity': quantity}));
+    if (response.statusCode == 200) {
+      final data = await jsonDecode(response.body);
+      print('$data');
+      return data;
+    } else {
+      throw Exception("Unable to add data");
+    }
+  }
 }
-
-

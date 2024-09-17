@@ -12,9 +12,7 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen> {
   final ApiService _apiService = ApiService();
   late Future<List<Map<String, dynamic>>> _products;
 
-  // Define the base URL
-  final String baseUrl =
-      'http://127.0.0.1:8000'; // Use 10.0.2.2 for Android emulators
+  final String baseUrl = 'http://127.0.0.1:8000'; // Use 10.0.2.2 for Android emulators
 
   @override
   void initState() {
@@ -32,9 +30,14 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen> {
             MaterialPageRoute(builder: (_) => AddProductScreen()),
           );
         },
-        child: Icon(Icons.add),
+        child: Icon(Icons.add, size: 30),
+        backgroundColor: Colors.green,
+        tooltip: 'Add Product',
       ),
-      appBar: AppBar(title: Text('My Products')),
+      appBar: AppBar(
+        title: Text('My Products'),
+        backgroundColor: Colors.green,
+      ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _products,
         builder: (context, snapshot) {
@@ -45,76 +48,89 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen> {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No products found.'));
+            return Center(
+                child: Text('No products found.',
+                    style: TextStyle(fontSize: 18, color: Colors.grey)));
           }
 
           final products = snapshot.data!;
           return ListView.builder(
-            padding: EdgeInsets.all(8.0), // Reduced padding around the ListView
+            padding: EdgeInsets.all(8.0), // Increased padding around the ListView
             itemCount: products.length,
             itemBuilder: (context, index) {
               final product = products[index];
               final imageUrl = product['productimage'];
-              final fullimage = '$baseUrl$imageUrl';
+              final fullImageUrl = '$baseUrl$imageUrl';
 
-              // Construct the full URL for the image
-              final fullImageUrl =
-                  imageUrl != null ? '$baseUrl$imageUrl' : null;
+              // Convert price to double
+              final priceString = product['price'].toString();
+              final price = double.tryParse(priceString) ?? 0.0;
 
-              // Convert price to double if needed
-              final price = double.tryParse(product['price'].toString()) ?? 0.0;
-
-              return Container(
-                margin: EdgeInsets.symmetric(
-                    vertical: 8.0, horizontal: 8.0), // Reduced margin
-                child: Card(
-                  color: Colors.white, // Set the card color to white
-                  elevation: 1, // Added shadow
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(8.0), // Adjusted border radius
-                  ),
-                  child: SizedBox(
-                    height: 160, // Adjusted height for larger image
-                    child: ListTile(
-                      contentPadding: EdgeInsets.all(
-                          8.0), // Reduced padding inside ListTile
-                      leading: Image.network(fullimage,fit: BoxFit.fill,),
-                      title: Text(
-                        product['name'],
-                        style: Theme.of(context).textTheme.headline6?.copyWith(
-                              fontSize: 18, // Font size
-                              fontWeight: FontWeight.bold,
-                            ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      subtitle: Text(
-                        '\$${price.toStringAsFixed(2)}',
-                        style: Theme.of(context).textTheme.subtitle1?.copyWith(
-                              fontSize: 16, // Font size
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UpdateProductScreen(
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => UpdateProductScreen(
                               productId: product['id'],
                               name: product['name'],
                               description: product['description'],
-                              price:
-                                  price, // Ensure price is passed as a double
-                              imageUrl: fullImageUrl,
+                              price: price))); // Pass price as double
+                },
+                child: Container(
+                  margin: EdgeInsets.symmetric(vertical: 8.0), // Increased margin
+                  child: Card(
+                    color: Colors.white,
+                    elevation: 2, // Enhanced shadow
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                    ),
+                    child: SizedBox(
+                      height: 150, // Increased height
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(12.0),
+                              bottomLeft: Radius.circular(12.0),
+                            ),
+                            child: Image.network(
+                              fullImageUrl,
+                              width: 150, // Increased width
+                              height: 200, // Increased height
+                              fit: BoxFit.cover,
                             ),
                           ),
-                        ).then((_) {
-                          // Refresh the product list after updating
-                          setState(() {
-                            _products = _apiService.fetchAllProducts();
-                          });
-                        });
-                      },
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.all(16.0), // Increased padding inside the card
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    product['name'],
+                                    style: Theme.of(context).textTheme.headline6?.copyWith(
+                                          fontSize: 20, // Larger font size
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  SizedBox(height: 8.0),
+                                  Text(
+                                    '\Rs ${price.toStringAsFixed(2)}',
+                                    style: Theme.of(context).textTheme.subtitle1?.copyWith(
+                                          fontSize: 18, // Larger font size
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.green,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

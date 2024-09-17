@@ -1,15 +1,52 @@
 import 'package:agrotech_app/api.dart';
-
+import 'package:agrotech_app/marketpalce/Screens/Buyer/cart.dart';
+import 'package:agrotech_app/marketpalce/Screens/Buyer/productdetail.dart';
 import 'package:flutter/material.dart';
 
 class BuyerScreen extends StatelessWidget {
   final ApiService apiService = ApiService(); // Initialize ApiService instance
   final String baseUrl = 'http://127.0.0.1:8000'; // Define the base URL
 
+  // Function to handle adding a product to the cart
+  void _addToCart(BuildContext context, int productId) async {
+    try {
+      // Call the ApiService to add the item to the cart
+      await apiService.addtocart(productId, 1); // Default quantity is 1
+
+      // Show a confirmation message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Product added to cart!'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      // Handle any errors that might occur
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error adding product to cart: $e'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Products')),
+      appBar: AppBar(
+        title: Text('Products'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => CartPage()));
+            },
+            icon: const Icon(Icons.shopping_cart),
+            iconSize: 25,
+          )
+        ],
+      ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: apiService.fetchAllProducts(),
         builder: (context, snapshot) {
@@ -32,10 +69,12 @@ class BuyerScreen extends StatelessWidget {
               final productName = product['name'];
               final productPrice = product['price'];
               final productDescription = product['description'];
-              final productId = product['id']; // Ensure you extract the product ID
+              final productId =
+                  product['id']; // Ensure you extract the product ID
 
               // Construct the full image URL
-              final fullImageUrl = imageUrl != null ? '$baseUrl$imageUrl' : null;
+              final fullImageUrl =
+                  imageUrl != null ? '$baseUrl$imageUrl' : null;
 
               return Card(
                 margin: EdgeInsets.all(16.0),
@@ -52,7 +91,8 @@ class BuyerScreen extends StatelessWidget {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12.0),
                           child: fullImageUrl != null
-                              ? Image.network(fullImageUrl, fit: BoxFit.cover, height: 150.0)
+                              ? Image.network(fullImageUrl,
+                                  fit: BoxFit.cover, height: 150.0)
                               : Container(color: Colors.grey, height: 150.0),
                         ),
                       ),
@@ -64,13 +104,19 @@ class BuyerScreen extends StatelessWidget {
                           children: <Widget>[
                             Text(
                               productName,
-                              style: Theme.of(context).textTheme.headline5?.copyWith(fontWeight: FontWeight.bold),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline5
+                                  ?.copyWith(fontWeight: FontWeight.bold),
                               overflow: TextOverflow.ellipsis,
                             ),
                             SizedBox(height: 8.0),
                             Text(
-                              '\$${productPrice.toString()}',
-                              style: Theme.of(context).textTheme.subtitle1?.copyWith(color: Colors.green),
+                              '\Rs ${productPrice.toString()}',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subtitle1
+                                  ?.copyWith(color: Colors.green),
                             ),
                             SizedBox(height: 8.0),
                             Text(
@@ -84,16 +130,22 @@ class BuyerScreen extends StatelessWidget {
                               alignment: Alignment.bottomRight,
                               child: ElevatedButton(
                                 onPressed: () {
-                                  // Handle button press
+                                  // Call _addToCart when the button is pressed
+                                  _addToCart(context, productId);
                                 },
                                 style: ElevatedButton.styleFrom(
                                   primary: Colors.blue, // Background color
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0), // Button shape
+                                    borderRadius: BorderRadius.circular(
+                                        8.0), // Button shape
                                   ),
-                                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0, vertical: 12.0),
                                 ),
-                                child: Text('Buy'),
+                                child: const Text(
+                                  'Add to cart',
+                                  style: TextStyle(color: Colors.white),
+                                ),
                               ),
                             ),
                           ],
