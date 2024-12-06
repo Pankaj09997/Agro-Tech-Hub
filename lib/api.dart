@@ -220,7 +220,7 @@ class ApiService {
       request.fields['caption'] = caption;
 
       if (videoFile != null) {
-        //adding the file to the request file
+        //adding the file to the request files
         request.files.add(
           //convering the file to the bytes which is suitable for using
           http.MultipartFile.fromBytes(
