@@ -12,6 +12,7 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
+  Timer? _navigationTimer;
 
   @override
   void initState() {
@@ -27,11 +28,11 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
       curve: Curves.easeInOut,
     );
 
-    // Start the fade animation in loop
-    _controller.repeat(reverse: true);
+    // Start the fade animation once
+    _controller.forward();
 
     // Navigate to Login page after 5 seconds
-    Future.delayed(const Duration(seconds: 5), () {
+    _navigationTimer = Timer(const Duration(seconds: 5), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const Login()),
@@ -42,7 +43,8 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
   @override
   void dispose() {
-    _controller.dispose();
+    _navigationTimer?.cancel(); // Cancel the timer
+    _controller.dispose(); // Dispose the controller
     super.dispose();
   }
 
