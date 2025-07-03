@@ -14,7 +14,7 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen> {
   final ApiService _apiService = ApiService();
   late Future<List<Map<String, dynamic>>> _products;
 
-  final String baseUrl = 'http://127.0.0.1:8000';
+  final String baseUrl = 'https://agro-tech-hub-api.onrender.com';
 
   @override
   void initState() {
