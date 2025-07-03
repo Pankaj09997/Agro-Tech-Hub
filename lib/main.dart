@@ -47,7 +47,7 @@ class _MyAppState extends State<MyApp> {
             home: const SplashPage(),
             initialRoute: "/",
             onGenerateRoute: RouteGenerator.generateRoute,
-          );
+          );  
         },
       ),
     );
