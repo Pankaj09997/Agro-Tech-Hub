@@ -17,14 +17,14 @@ class RouteGenerator {
   static final ApiService _apiService = ApiService();
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      // case "/":
+      //   return MaterialPageRoute(builder: (_) => SplashPage());
       case "/":
-        return MaterialPageRoute(builder: (_) => SplashPage());
-      case "/login":
         return MaterialPageRoute(builder: (_) => Login());
       case "/home":
         return MaterialPageRoute(builder: (_) => HomePage());
       case "/network":
-        return MaterialPageRoute(builder: (_) => NetworkSplash());
+        return MaterialPageRoute(builder: (_) => NetworkPage());
       case "/stream":
         return MaterialPageRoute(builder: (_) => StreamingSite());
       case "/test":

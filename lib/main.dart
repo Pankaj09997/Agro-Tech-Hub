@@ -1,5 +1,6 @@
 import 'package:agrotech_app/NotificationService/NotificationService.dart';
 import 'package:agrotech_app/bots/consts.dart';
+import 'package:agrotech_app/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:agrotech_app/Routes/routes.dart';
@@ -44,7 +45,7 @@ class _MyAppState extends State<MyApp> {
                 return child!;
               }
             },
-            home: const SplashPage(),
+            home: const Login(),
             initialRoute: "/",
             onGenerateRoute: RouteGenerator.generateRoute,
           );  
@@ -75,7 +76,7 @@ class ForcedMobileAppView extends StatelessWidget {
             ),
           ],
         ),
-        child: const SplashPage(), // Start from your splash page
+        child: const Login(), // Start from your splash page
       ),
     );
   }
