@@ -1,7 +1,9 @@
+
 import 'package:flutter/material.dart';
 import 'package:agrotech_app/api.dart';
 import 'package:agrotech_app/marketpalce/Screens/Farmer/AddProductScreen.dart';
 import 'package:agrotech_app/marketpalce/Screens/Farmer/UpdateProductScreen.dart';
+import 'package:flutter/widgets.dart';
 
 class FarmerProductsScreen extends StatefulWidget {
   @override
@@ -12,7 +14,7 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen> {
   final ApiService _apiService = ApiService();
   late Future<List<Map<String, dynamic>>> _products;
 
-  final String baseUrl = 'http://127.0.0.1:8000'; // Use 10.0.2.2 for Android emulators
+  final String baseUrl = 'http://127.0.0.1:8000';
 
   @override
   void initState() {
@@ -37,6 +39,7 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen> {
       appBar: AppBar(
         title: Text('My Products'),
         backgroundColor: Colors.green,
+
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _products,
@@ -55,7 +58,8 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen> {
 
           final products = snapshot.data!;
           return ListView.builder(
-            padding: EdgeInsets.all(8.0), // Increased padding around the ListView
+            padding:
+                EdgeInsets.all(8.0), // Increased padding around the ListView
             itemCount: products.length,
             itemBuilder: (context, index) {
               final product = products[index];
@@ -78,12 +82,14 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen> {
                               price: price))); // Pass price as double
                 },
                 child: Container(
-                  margin: EdgeInsets.symmetric(vertical: 8.0), // Increased margin
+                  margin:
+                      EdgeInsets.symmetric(vertical: 8.0), // Increased margin
                   child: Card(
                     color: Colors.white,
                     elevation: 2, // Enhanced shadow
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0), // Rounded corners
+                      borderRadius:
+                          BorderRadius.circular(12.0), // Rounded corners
                     ),
                     child: SizedBox(
                       height: 150, // Increased height
@@ -103,14 +109,18 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen> {
                           ),
                           Expanded(
                             child: Padding(
-                              padding: EdgeInsets.all(16.0), // Increased padding inside the card
+                              padding: EdgeInsets.all(
+                                  16.0), // Increased padding inside the card
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
                                     product['name'],
-                                    style: Theme.of(context).textTheme.headline6?.copyWith(
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
                                           fontSize: 20, // Larger font size
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -119,7 +129,10 @@ class _FarmerProductsScreenState extends State<FarmerProductsScreen> {
                                   SizedBox(height: 8.0),
                                   Text(
                                     '\Rs ${price.toStringAsFixed(2)}',
-                                    style: Theme.of(context).textTheme.subtitle1?.copyWith(
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
                                           fontSize: 18, // Larger font size
                                           fontWeight: FontWeight.w600,
                                           color: Colors.green,

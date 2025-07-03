@@ -200,30 +200,7 @@ class _LoginState extends State<Login> {
                     ),
 
                     SizedBox(height: height * 0.02),
-                    Center(
-                      child: Container(
-                        height: height * 0.05,
-                        width: width * 0.55,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          color: Color.fromARGB(255, 232, 226, 226),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Image.asset(
-                                "assets/google.png",
-                                height: height * 0.04,
-                              ),
-                            ),
-                            SizedBox(width: 8), // Add SizedBox for gap
-                            Text("Sign in with Google"),
-                          ],
-                        ),
-                      ),
-                    ),
+  
                   ],
                 ),
               )
@@ -376,30 +353,7 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     SizedBox(height: height * 0.03),
-                    Center(
-                      child: Container(
-                        height: height * 0.1,
-                        width: width * 0.55,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          color: Color.fromARGB(255, 232, 226, 226),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Image.asset(
-                                "assets/google.png",
-                                height: height * 0.04,
-                              ),
-                            ),
-                            SizedBox(width: 8), // Add SizedBox for gap
-                            Text("Sign in with Google"),
-                          ],
-                        ),
-                      ),
-                    ),
+
                   ],
                 ),
               ),

@@ -14,6 +14,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _phnoController = TextEditingController();
   File? _image;
   final _picker = ImagePicker();
 
@@ -52,7 +54,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
       } else {
         // Show error message with SnackBar
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to add product: ${response['message']}')),
+          SnackBar(
+              content: Text('Failed to add product: ${response['message']}')),
         );
       }
     } catch (e) {
@@ -91,6 +94,30 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a description';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _addressController,
+                decoration: InputDecoration(labelText: 'Address'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a address';
+                  }
+                  return null;
+                },
+              ),
+               TextFormField(
+                controller: _phnoController,
+                decoration: InputDecoration(labelText: 'Phone Number'),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the Phoneno';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid Phoneno';
                   }
                   return null;
                 },

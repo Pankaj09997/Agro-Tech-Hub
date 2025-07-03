@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ApiService {
   String? _token;
   int? userId;
-  final String baseUrl = "http://127.0.0.1:8000/api";
+  final String baseUrl = "https://agro-tech-hub-api.onrender.com/api";
 // shared preferences to store the token
   Future<void> _loadToken() async {
     // instance to get the access to the shared preferences storage
@@ -675,4 +675,54 @@ class ApiService {
       throw Exception("Unable to add data");
     }
   }
+  Future<List<dynamic>> fetchNotifications() async {
+  await _loadToken();
+  if (_token == null) {
+    throw Exception("User is not authenticated");
+  }
+
+  final response = await http.get(
+    Uri.parse('$baseUrl/notifications/'), 
+    headers: <String, String>{
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $_token',
+    },
+  );
+
+  if (response.statusCode == 200) {
+    List<dynamic> notifications = jsonDecode(response.body);
+    return notifications;
+  } else {
+    throw Exception("Failed to load notifications: ${response.body}");
+  }
+}
+Future<Map<String, dynamic>> createNotification(int productId, int farmerId, int buyerId, String message) async {
+  await _loadToken();  // Ensure token is loaded
+  if (_token == null) {
+    throw Exception("User is not authenticated");
+  }
+
+  final response = await http.post(
+    Uri.parse('$baseUrl/notifications/'), // Make sure this is the correct endpoint
+    headers: <String, String>{
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $_token',
+    },
+    body: jsonEncode({
+      'product': productId,  
+      'farmer': farmerId,     
+      'buyer': buyerId,       
+      'message': message,     
+    }),
+  );
+
+  if (response.statusCode == 201) {
+    final data = jsonDecode(response.body);
+    return data;
+  } else {
+    throw Exception("Failed to create notification: ${response.body}");
+  }
+}
+
+
 }

@@ -54,8 +54,7 @@ class JoinWithCode extends StatelessWidget {
               },
               child: Text("Join"),
               style: ElevatedButton.styleFrom(
-                fixedSize: Size(50, 30),
-                primary: Colors.indigo,
+                fixedSize: Size(50, 30), backgroundColor: Colors.indigo,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25)),
               ),

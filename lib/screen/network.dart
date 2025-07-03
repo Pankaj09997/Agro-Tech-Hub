@@ -65,11 +65,7 @@ class _NetworkPageState extends State<NetworkPage> {
             iconSize: 30,
           ),
           SizedBox(width: 10),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.notifications, color: theme.iconTheme.color ?? Colors.black),
-            iconSize: 30,
-          ),
+
         ],
       ),
       body: SingleChildScrollView(
@@ -177,14 +173,14 @@ class _NetworkPageState extends State<NetworkPage> {
                                       children: [
                                         Text(
                                           post['author_name'],
-                                          style: theme.textTheme.bodyText1?.copyWith(
+                                          style: theme.textTheme.bodyMedium?.copyWith(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
                                           ) ?? TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                         ),
                                         Text(
                                           post['created_at'],
-                                          style: theme.textTheme.bodyText2?.copyWith(
+                                          style: theme.textTheme.bodyMedium?.copyWith(
                                             color: theme.hintColor,
                                             fontSize: 12,
                                           ) ?? TextStyle(color: theme.hintColor, fontSize: 12),
@@ -196,7 +192,7 @@ class _NetworkPageState extends State<NetworkPage> {
                                 SizedBox(height: 10),
                                 Text(
                                   post['content'] ?? '',
-                                  style: theme.textTheme.bodyText1,
+                                  style: theme.textTheme.bodyMedium,
                                 ),
                                 if (post['image'] != null)
                                   GestureDetector(
@@ -258,12 +254,7 @@ class _NetworkPageState extends State<NetworkPage> {
                                         );
                                       },
                                     ),
-                                    ActionButton(
-                                      icon: Icons.share,
-                                      color: theme.iconTheme.color ?? Colors.black,
-                                      label: "Share",
-                                      onTap: () {},
-                                    ),
+      
                                   ],
                                 ),
                               ],

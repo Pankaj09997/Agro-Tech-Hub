@@ -25,7 +25,7 @@ class _VideoCallState extends State<VideoCall> {
 
   Future<void> getToken() async {
     String link =
-        "https://agora-node-tokenserver-1.davidcaleb.repl.co/access_token?channelName=${widget.channelName}";
+        "https://d7dfbe05-e2f5-45e7-9fa1-4fdb7eeb6130-00-23g8f4rjywj4l.pike.replit.dev/access_token?channelName=test&uid=456&role=publisher&expireTime=1800";
 
     Response _response = await get(Uri.parse(link));
     Map data = jsonDecode(_response.body);
@@ -35,7 +35,8 @@ class _VideoCallState extends State<VideoCall> {
     _client = AgoraClient(
         agoraConnectionData: AgoraConnectionData(
           appId: "70fad335b0284a3f88dadd0421699dec",
-          tempToken: "007eJxTYBDJXaV0a4693guLhPKYDZfiPA/umBttf/jYgSBxmdnNBycoMJgbpCWmGBubJhkYWZgkGqdZWKQkpqQYmBgZmllapqQmN71/ktYQyMiw+P5mVkYGCATxWRhKUotLGBgAcBEhKg==",
+          tempToken: "007eJxTYDjP4OF5S6WY8cf7ltVaDQuzj5eff2nlttSqU4IzLUmsz02BwdwgLTHF2Ng0ycDIwiTROM3CIiUxJcXAxMjQzNIyJTVZuf5lWkMgIwN//DxGRgYIBPFZGEpSi0sYGADpbx3p",
+        
           channelName: widget.channelName,
         ),
         enabledPermission: [

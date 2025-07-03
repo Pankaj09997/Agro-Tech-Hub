@@ -1,4 +1,5 @@
 import 'package:agrotech_app/api.dart';
+import 'package:agrotech_app/marketpalce/Screens/Buyer/Form.dart';
 import 'package:flutter/material.dart';
 
 class CartPage extends StatefulWidget {
@@ -46,7 +47,7 @@ class _CartPageState extends State<CartPage> {
           }
 
           final cartItems = snapshot.data!;
-         
+
           final totalPrice = _calculateTotalPrice(cartItems);
 
           return Column(
@@ -98,7 +99,7 @@ class _CartPageState extends State<CartPage> {
                                   Text(
                                     productName,
                                     style:
-                                        Theme.of(context).textTheme.headline6,
+                                        Theme.of(context).textTheme.bodyMedium,
                                   ),
                                   SizedBox(height: 8.0),
                                   Text('Quantity: $quantity'),
@@ -143,11 +144,16 @@ class _CartPageState extends State<CartPage> {
                     SizedBox(height: 16.0),
                     ElevatedButton(
                       onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(
+                                "Your Order Has Been placed Sucessfully")));
                         print("Proceed to buy items");
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => FormPage()));
                       },
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size.fromHeight(50),
-                        primary: Colors.green,
+                        backgroundColor: Colors.green,
                       ),
                       child: Text(
                         'Buy Now',

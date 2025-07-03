@@ -1,6 +1,7 @@
 import 'package:agrotech_app/VideoCall/videohome.dart';
 import 'package:agrotech_app/api.dart';
 import 'package:agrotech_app/marketpalce/citizenverify.dart';
+
 import 'package:agrotech_app/screen/Advice.dart';
 import 'package:agrotech_app/screen/Streaming.dart';
 import 'package:agrotech_app/screen/Test.dart';
@@ -9,7 +10,6 @@ import 'package:agrotech_app/login.dart';
 import 'package:agrotech_app/screen/network.dart';
 import 'package:agrotech_app/screen/splashscreen/splash.dart';
 import 'package:agrotech_app/screen/splashscreen/networksplash.dart';
-
 
 import 'package:flutter/material.dart';
 
@@ -37,6 +37,7 @@ class RouteGenerator {
             builder: (_) => CitizenshipVerificationScreen());
       case "/video":
         return MaterialPageRoute(builder: (_) => Videohome());
+
 
       default:
         return MaterialPageRoute(builder: (_) => Error());

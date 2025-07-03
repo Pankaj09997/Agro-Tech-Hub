@@ -26,8 +26,8 @@ final ThemeData lightMode = ThemeData(
     ),
   ),
   textTheme: TextTheme(
-    bodyText1: TextStyle(color: Colors.black),
-    bodyText2: TextStyle(color: Colors.black),
+    headlineMedium: TextStyle(color: Colors.black),
+    headlineSmall: TextStyle(color: Colors.black),
   ),
   iconTheme: IconThemeData(color: Colors.black),
   buttonTheme: ButtonThemeData(
@@ -54,8 +54,8 @@ final ThemeData darkMode = ThemeData(
     ),
   ),
   textTheme: TextTheme(
-    bodyText1: TextStyle(color: Colors.white),
-    bodyText2: TextStyle(color: Colors.white),
+    headlineMedium: TextStyle(color: Colors.white),
+    headlineSmall: TextStyle(color: Colors.white),
   ),
   iconTheme: IconThemeData(color: Colors.white),
   buttonTheme: ButtonThemeData(
