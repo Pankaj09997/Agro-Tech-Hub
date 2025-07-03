@@ -12,9 +12,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService.init();
   tz.initializeTimeZones();
-  Gemini.init(
-    apiKey: GEMINI_API_KEY,
-  );
+  Gemini.init(apiKey: GEMINI_API_KEY);
   runApp(const MyApp());
 }
 
@@ -35,11 +33,49 @@ class _MyAppState extends State<MyApp> {
           return MaterialApp(
             theme: theme,
             debugShowCheckedModeBanner: false,
+            builder: (context, child) {
+              final width = MediaQuery.of(context).size.width;
+
+              if (width >= 800) {
+                // Large screen like tablet or desktop — force mobile UI layout
+                return const ForcedMobileAppView();
+              } else {
+                // Normal mobile flow
+                return child!;
+              }
+            },
             home: const SplashPage(),
             initialRoute: "/",
             onGenerateRoute: RouteGenerator.generateRoute,
           );
         },
+      ),
+    );
+  }
+}
+
+class ForcedMobileAppView extends StatelessWidget {
+  const ForcedMobileAppView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // You can customize this container to simulate mobile view on larger screens
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        width: 480, // Fixed width to mimic mobile
+        decoration: BoxDecoration(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              spreadRadius: 2,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: const SplashPage(), // Start from your splash page
       ),
     );
   }
