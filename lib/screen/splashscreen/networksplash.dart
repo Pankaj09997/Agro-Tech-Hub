@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:agrotech_app/screen/network.dart';
 import 'package:flutter/material.dart';
 
@@ -10,103 +12,98 @@ class NetworkSplash extends StatefulWidget {
 
 class _NetworkSplashState extends State<NetworkSplash>
     with SingleTickerProviderStateMixin {
-  // Mixin that provides a single ticker, required for animations.
-
-  //managing the animation
   late AnimationController _animationController;
-  //animating object to be animated which would be controlled by the controller
   late Animation<double> _animation;
-  //tracks the number of times the animation has been played
-  int _animationcounts = 0;
-  //tracks the direction of the animation
-  bool _forward = true;
+  Timer? _navigationTimer;
+  bool _isDisposed = false;
 
   @override
   void initState() {
-    // TODO: implement initState
-    _animationController =
-        AnimationController
-        (
-          //vsync:this means that the animation to be played when the widget is to be played
-          vsync: this,
-          //Giving duration to the animation 
-           duration: Duration(seconds: 2));
+    super.initState();
+    
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
 
     _animation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.bounceInOut,
     );
-    _animationController.forward();
+
+    // Set up animation loop (2 cycles)
     _animationController.addStatusListener((status) {
-      //checks whether the animation has been completed or restarted
-      if (status == AnimationStatus.completed ||
-          status == AnimationStatus.dismissed) {
-        if (_animationcounts < 2) {
-          _forward = !_forward;
-        }
-        if (_forward) {
-          _animationController.forward();
-        } else {
-          _animationController.reverse();
-        }
-        _animationcounts++;
-      } else {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => NetworkPage()));
+      if (_isDisposed) return;
+      
+      if (status == AnimationStatus.completed) {
+        _animationController.reverse();
+      } else if (status == AnimationStatus.dismissed) {
+        _animationController.forward();
       }
     });
-    super.initState();
+
+    _animationController.forward();
+
+    // Navigate after 5 seconds (2 full animation cycles)
+    _navigationTimer = Timer(const Duration(seconds: 5), () {
+      if (!_isDisposed && mounted) {
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => const NetworkPage(),
+            transitionsBuilder: (_, a, __, c) => 
+              FadeTransition(opacity: a, child: c),
+            transitionDuration: const Duration(milliseconds: 500),
+          ),
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
+    _isDisposed = true;
+    _navigationTimer?.cancel();
     _animationController.dispose();
-    // TODO: implement dispose
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
-    final orientation = MediaQuery.of(context).orientation;
+    final size = MediaQuery.of(context).size;
+    final isPortrait = size.height > size.width;
+
     return Scaffold(
-      body: orientation == Orientation.portrait
-          ? Column(
-              children: [
-                SizedBox(
-                  height: height * 0.2,
-                ),
-                FadeTransition(
-                  opacity: _animation,
-                  child: Image.asset('assets/network.jpg'),
-                ),
-                Text(
-                  "Agro-Tech Hub",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
-              ],
-            )
-          : SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: height * 0.1,
-                    width: width * 1,
-                  ),
-                  FadeTransition(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: FadeTransition(
                     opacity: _animation,
-                    child: Image.asset('assets/network.jpg',
-                        height: height * 0.8, width: width * 0.8),
+                    child: Image.asset(
+                      'assets/network.jpg',
+                      fit: BoxFit.contain,
+                    ),
                   ),
-                  Text(
-                    "Agro-Tech Hub",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  ),
-                ],
+                ),
               ),
-            ),
+              const SizedBox(height: 20),
+              const Text(
+                "Agro-Tech Hub",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
