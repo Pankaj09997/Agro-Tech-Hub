@@ -11,7 +11,7 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   final ApiService _apiService = ApiService();
-  final String baseurl = "http://127.0.0.1:8000";
+  final String baseurl = "https://agro-tech-hub-api.onrender.com";
 
   double _calculateTotalPrice(List<dynamic> cartItems) {
     double total = 0;

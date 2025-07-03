@@ -35,7 +35,7 @@ class _BuyerDetailPageState extends State<BuyerDetailPage> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (snapshot.hasData) {
             final product = snapshot.data!;
-            final baseUrl = 'http://127.0.0.1:8000';
+            final baseUrl = 'https://agro-tech-hub-api.onrender.com';
             final imageUrl = product['productimage'] ?? '';
             final fullurl = '$baseUrl$imageUrl';
 

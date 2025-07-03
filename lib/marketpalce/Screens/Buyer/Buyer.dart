@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 class BuyerScreen extends StatelessWidget {
   final ApiService apiService = ApiService(); // Initialize ApiService instance
-  final String baseUrl = 'http://127.0.0.1:8000'; // Define the base URL
+  final String baseUrl = 'https://agro-tech-hub-api.onrender.com'; // Define the base URL
 
   // Function to handle adding a product to the cart
   void _addToCart(BuildContext context, int productId) async {

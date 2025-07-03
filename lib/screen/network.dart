@@ -202,7 +202,7 @@ class _NetworkPageState extends State<NetworkPage> {
                                         MaterialPageRoute(
                                           builder: (_) => FullScreenImageScreen(
                                             imageUrl:
-                                                'http://127.0.0.1:8000${post['image']}',
+                                                'https://agro-tech-hub-api.onrender.com${post['image']}',
                                           ),
                                         ),
                                       );
@@ -212,7 +212,7 @@ class _NetworkPageState extends State<NetworkPage> {
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(16),
                                         child: Image.network(
-                                          'http://127.0.0.1:8000${post['image']}',
+                                          'https://agro-tech-hub-api.onrender.com${post['image']}',
                                           height: height * 0.3,
                                           width: double.infinity,
                                           fit: BoxFit.cover,
